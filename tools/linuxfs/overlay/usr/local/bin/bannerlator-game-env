@@ -6,6 +6,60 @@ import sys
 from pathlib import Path
 
 
+# What a title needs on this runtime whatever the shared settings say, after GameNative's game fixes
+# (app/gamenative/gamefixes): environment entries applied above the shared ones - the FEX preset
+# among them - and below the user's own entries for that game, and arguments added to the game's
+# command line unless the launch options already name them.
+KNOWN_FIXES = {
+    # Slay the Spire 2 (Godot 4 with .NET 9). The crash 5-35 s after the window shows comes from
+    # tabtip.exe, which Proton's explorer.exe starts in every prefix: on each focus change it reads
+    # the focused element's UI Automation properties, over COM, from inside the game. Each of four
+    # logged crashes (POCO F8 Ultra, 2026-10-04) came as tabtip's first call reached the game: the RPC
+    # thread serving it faulted at rpcrt4.dll+0x76E6C and called on through stale objects - into the
+    # bytes ".ctor", into the middle of coreclr.dll - before .NET's internal error 0x80131506 or an
+    # exit from that thread, or the process was gone 12-14 ms after the thread started. With
+    # tabtip.exe=d, five launches ran 2.5 min and more with no such fault. tabtip only raises Steam's
+    # keyboard when SteamDeck=1, which this runtime does not set, so it does nothing else here;
+    # tabtip.exe=d stops explorer from starting it. The rest is GameNative's STEAM_2868840 plus
+    # tiered compilation off and the FEX half-barrier, added while the stale pointer looked like a
+    # .NET or FEX fault; they are to come out one by one now that the cause is known.
+    "2868840": {
+        "env": {
+            "DOTNET_TieredCompilation": "0",
+            "FEX_TSOENABLED": "1",
+            "FEX_VECTORTSOENABLED": "1",
+            "FEX_MEMCPYSETTSOENABLED": "1",
+            "FEX_HALFBARRIERTSOENABLED": "1",
+            "DOTNET_EnableWriteXorExecute": "0",
+            "DOTNET_GCHeapHardLimit": "0x400000000",
+        },
+        # Ahead of any overrides already set, so a later entry for the same DLL still wins.
+        "dll_overrides": "icu=d;tabtip.exe=d",
+        "args": ["--rendering-driver", "vulkan"],
+    },
+}
+
+
+def known_env(env, app_id):
+    """env with the KNOWN_FIXES entries for app_id applied, as a new dict."""
+    fix = KNOWN_FIXES.get(app_id)
+    if not fix:
+        return env
+    result = {**env, **fix.get("env", {})}
+    if fix.get("dll_overrides"):
+        current = result.get("WINEDLLOVERRIDES")
+        result["WINEDLLOVERRIDES"] = fix["dll_overrides"] + (";" + current if current else "")
+    return result
+
+
+def known_args(command, app_id):
+    """command with the KNOWN_FIXES arguments for app_id added, unless it already names them."""
+    args = KNOWN_FIXES.get(app_id, {}).get("args", [])
+    if not args or args[0] in command:
+        return command
+    return command + args
+
+
 def game_id(env):
     prefix = env.get("STEAM_COMPAT_DATA_PATH", "").rstrip("/")
     if not prefix:
@@ -20,21 +74,27 @@ def game_id(env):
 
 
 def apply_config(env, config, app_id):
+    """Shared entries, then the title's known fixes, then the user's entries for that game."""
     if config.get("version") != 1:
         raise ValueError("unsupported environment configuration")
-    result = env.copy()
-    entries = dict(config.get("shared", {}))
-    entries.update(config.get("games", {}).get(app_id, {}))
-    for name, value in entries.items():
-        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
-            raise ValueError("invalid environment name")
-        if value is None:
-            result.pop(name, None)
-        elif isinstance(value, str) and "\0" not in value and len(value) <= 8192:
-            result[name] = value
-        else:
-            raise ValueError("invalid environment value")
-    return result
+    layers = (dict(config.get("shared", {})), dict(config.get("games", {}).get(app_id, {})))
+    for entries in layers:
+        for name, value in entries.items():
+            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                raise ValueError("invalid environment name")
+            if value is not None and not (isinstance(value, str) and "\0" not in value and len(value) <= 8192):
+                raise ValueError("invalid environment value")
+
+    def applied(base, entries):
+        result = base.copy()
+        for name, value in entries.items():
+            if value is None:
+                result.pop(name, None)
+            else:
+                result[name] = value
+        return result
+
+    return applied(known_env(applied(env, layers[0]), app_id), layers[1])
 
 
 def main():
@@ -49,9 +109,13 @@ def main():
             with path.open(encoding="utf-8") as source:
                 env = apply_config(env, json.load(source), app_id)
         except FileNotFoundError:
-            pass
+            env = known_env(env, app_id)
         except (OSError, ValueError, TypeError, AttributeError):
             print("bannerlator-game-env: invalid configuration; using inherited environment", file=sys.stderr)
+            env = known_env(env, app_id)
+        if app_id in KNOWN_FIXES:
+            command = known_args(command, app_id)
+            print("bannerlator-game-env: applied the known fixes for app %s" % app_id, file=sys.stderr)
     os.execvpe(command[0], command, env)
 
 

@@ -73,6 +73,8 @@ class ModeSettings(
     val fexPreset: String? = null,
     /** Steam only: games are stretched to fill the screen (null = not a Steam page). */
     val forceFullscreen: Boolean? = null,
+    /** Steam only: a tap still clicks in a game the client turned touch off for (null = not a Steam page). */
+    val gameTouch: Boolean? = null,
     val stretch16x9: Boolean? = null,
     /** Steam only: the client branch forced on the command line. */
     val steamChannel: String? = null,
@@ -132,6 +134,7 @@ class ModeSettingsActions(
     val onPickGameStorageFolder: () -> Unit = {},
     val onFexPreset: (String) -> Unit = {},
     val onForceFullscreen: (Boolean) -> Unit = {},
+    val onGameTouch: (Boolean) -> Unit = {},
     val onStretch16x9: (Boolean) -> Unit = {},
     val onSteamChannel: (String) -> Unit = {},
     val onSteamDeckMode: (Boolean) -> Unit = {},
@@ -232,6 +235,11 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
                 listOf("auto" to stringResource(R.string.common_auto), "touchpad" to stringResource(R.string.mode_touch_touchpad), "direct" to stringResource(R.string.mode_touch_direct)), s.touchMode,
                 note = stringResource(R.string.mode_touch_note),
                 onPick = a.onTouch,
+            )
+            if (s.gameTouch != null) ToggleRow(
+                host, "game-touch", stringResource(R.string.mode_game_touch),
+                stringResource(R.string.mode_game_touch_hint),
+                s.gameTouch, onChange = a.onGameTouch,
             )
             if (steam && s.oscMode != null) ChoiceRow(
                 host, "osc", stringResource(R.string.mode_osc), null,
