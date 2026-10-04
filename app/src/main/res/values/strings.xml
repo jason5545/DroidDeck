@@ -303,8 +303,6 @@
     <string name="mode_added_exe_note">Defaults to the .exe named after the folder, or else the largest.</string>
     <string name="mode_fill">Stretch games to fill the screen</string>
     <string name="mode_fill_hint">Keeps self-resizing games full screen. Turn off if a game shows up small. Applies next session.</string>
-    <string name="mode_game_touch">Touch in games</string>
-    <string name="mode_game_touch_hint">Steam turns touch off when a game has focus. On: a tap still clicks where it lands. Off: Steam decides. Applies at once.</string>
     <string name="mode_stretch169">Stretch 16:9 games</string>
     <string name="mode_stretch169_hint">On screens squarer than 16:9, stretches games to fill instead of showing bars. Applies next session.</string>
     <string name="mode_audio">Audio</string>
@@ -483,7 +481,6 @@
     <string name="drawer_next_page">Next page</string>
     <string name="drawer_hud">Performance HUD</string>
     <string name="drawer_fill">Stretch games to fill</string>
-    <string name="drawer_game_touch">Touch in games</string>
     <string name="drawer_scaling">Scaling mode</string>
     <string name="drawer_scaling_sharpness">Scaling sharpness</string>
     <string name="drawer_effects">Screen effects</string>

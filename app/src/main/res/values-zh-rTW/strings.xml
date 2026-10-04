@@ -303,8 +303,6 @@
     <string name="mode_added_exe_note">預設用跟資料夾同名的 .exe，沒有的話用最大的那個。</string>
     <string name="mode_fill">把遊戲拉伸到填滿螢幕</string>
     <string name="mode_fill_hint">讓會自己調整大小的遊戲維持全螢幕。如果遊戲顯示得很小，請關閉。下次工作階段生效。</string>
-    <string name="mode_game_touch">遊戲內觸控</string>
-    <string name="mode_game_touch_hint">遊戲取得焦點時，Steam 會關閉觸控。開啟：手指點到哪裡，就在哪裡按一下。關閉：交給 Steam 決定。立即生效。</string>
     <string name="mode_stretch169">拉伸 16:9 遊戲</string>
     <string name="mode_stretch169_hint">在比 16:9 更接近方形的螢幕上，把遊戲拉伸到填滿，不顯示黑邊。下次工作階段生效。</string>
     <string name="mode_audio">音訊</string>
@@ -482,7 +480,6 @@
     <string name="drawer_next_page">下一頁</string>
     <string name="drawer_hud">效能 HUD</string>
     <string name="drawer_fill">把遊戲拉伸到填滿</string>
-    <string name="drawer_game_touch">遊戲內觸控</string>
     <string name="drawer_scaling">縮放模式</string>
     <string name="drawer_scaling_sharpness">縮放銳利度</string>
     <string name="drawer_effects">畫面效果</string>

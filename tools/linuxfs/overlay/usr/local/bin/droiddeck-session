@@ -488,9 +488,10 @@ case $mode in
     # controller reached it. On a phone the screen is the main input, so a Disabled that still
     # stands with a game in focus is answered with BL_GAME_TOUCH_MODE (default 1: a tap clicks where
     # it lands and a drag drags, as touch works in WinNative and GameNative; 4 passes real touch
-    # through). Any other mode the client picks is left alone. The drawer's "Touch in games" turns
-    # this on and off live: the app writes 1 or 0 to ~/.droiddeck-game-touch, and turning it off puts
-    # the client's 5 back. BL_GAME_TOUCH_MODE=steam turns it off for the whole session.
+    # through). Any other mode the client picks is left alone. The app's Touch setting turns this on
+    # and off live: it writes 1 to ~/.droiddeck-game-touch while touch is direct (Direct, or Auto)
+    # and 0 for Touchpad or Off, and 0 puts the client's 5 back. BL_GAME_TOUCH_MODE=steam turns it
+    # off for the whole session.
     # What follows "=" in an xprop line, or $2 for a property that is missing or has no value
     # yet ("NAME(CARDINAL) =", which read leaves with nothing after the "=").
     xprop_value() {
