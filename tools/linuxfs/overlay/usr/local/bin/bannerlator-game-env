@@ -11,30 +11,35 @@ from pathlib import Path
 # among them - and below the user's own entries for that game, and arguments added to the game's
 # command line unless the launch options already name them.
 KNOWN_FIXES = {
-    # Slay the Spire 2 (Godot 4 with .NET 9). The crash 5-35 s after the window shows comes from
-    # tabtip.exe, which Proton's explorer.exe starts in every prefix: on each focus change it reads
-    # the focused element's UI Automation properties, over COM, from inside the game. Each of four
-    # logged crashes (POCO F8 Ultra, 2026-10-04) came as tabtip's first call reached the game: the RPC
-    # thread serving it faulted at rpcrt4.dll+0x76E6C and called on through stale objects - into the
-    # bytes ".ctor", into the middle of coreclr.dll - before .NET's internal error 0x80131506 or an
-    # exit from that thread, or the process was gone 12-14 ms after the thread started. With
-    # tabtip.exe=d, five launches ran 2.5 min and more with no such fault. tabtip only raises Steam's
-    # keyboard when SteamDeck=1, which this runtime does not set, so it does nothing else here;
-    # tabtip.exe=d stops explorer from starting it. The rest is GameNative's STEAM_2868840 plus
-    # tiered compilation off and the FEX half-barrier, added while the stale pointer looked like a
-    # .NET or FEX fault; they are to come out one by one now that the cause is known.
+    # Slay the Spire 2 (Godot 4.5.1 with .NET 9). Each entry was kept only after taking it out made
+    # the game fail (POCO F8 Ultra, 2026-10-04; a round is a cold start held for 150 s, passed when
+    # the game reaches its main menu and is still running at the end):
+    # - tabtip.exe=d: Proton's explorer.exe starts tabtip.exe in every prefix (programs/explorer/
+    #   desktop.c, start_tabtip_process). tabtip's UI Automation focus handler queries the focused
+    #   window, the game answers through Godot's AccessKit (UiaReturnRawElementProvider), and from
+    #   then on tabtip's calls run inside the game over COM. They fault there (rpcrt4 returns fault
+    #   packets, "stub_manager_delete Got page fault when releasing stub") and the game dies 18-52 s
+    #   after start: 3 of 3 rounds with tabtip on, 0 of 10 with it off. Why the game-side object is
+    #   bad is not known. tabtip only opens Steam's keyboard with SteamDeck=1, which the game does
+    #   not get on this runtime, Deck mode included, so nothing is lost. Godot's own
+    #   "--accessibility disabled" avoids the crash as well (3 of 3 with tabtip on).
+    # - DOTNET_GCHeapHardLimit: without it coreclr fails to initialize (the game's godot.log:
+    #   hostfxr_get_runtime_delegate failed with code -2147450743, CoreClrInitFailure), 2 of 2.
+    # - DOTNET_EnableWriteXorExecute=0: without it the game hangs at .NET start-up, main thread at
+    #   100 %, never reaching the C# side, 2 of 2.
+    # - DOTNET_TieredCompilation=0: without it the game died 76 s in, after the main menu, on a FEX
+    #   fault on the main thread amid JIT code rewrites, 1 of 1.
+    # - --rendering-driver vulkan: without it Godot picks D3D12 and its swap chain fails to create.
+    # Taken out: icu=d (the game's own ICU DLLs load and work, 5 of 5) and the FEX TSO overrides
+    # (the shared FEX preset is enough, 10 of 10).
     "2868840": {
         "env": {
             "DOTNET_TieredCompilation": "0",
-            "FEX_TSOENABLED": "1",
-            "FEX_VECTORTSOENABLED": "1",
-            "FEX_MEMCPYSETTSOENABLED": "1",
-            "FEX_HALFBARRIERTSOENABLED": "1",
             "DOTNET_EnableWriteXorExecute": "0",
             "DOTNET_GCHeapHardLimit": "0x400000000",
         },
         # Ahead of any overrides already set, so a later entry for the same DLL still wins.
-        "dll_overrides": "icu=d;tabtip.exe=d",
+        "dll_overrides": "tabtip.exe=d",
         "args": ["--rendering-driver", "vulkan"],
     },
 }
