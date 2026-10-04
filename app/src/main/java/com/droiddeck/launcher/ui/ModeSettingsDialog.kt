@@ -70,6 +70,8 @@ class ModeSettings(
     val renderer: String?,
     val gameStorage: String? = null,
     val storageOptions: List<Pair<String, String>> = emptyList(),
+    /** Steam only: record allocation and sampled storage timings in the next session's Share logs. */
+    val storageDiagnostics: Boolean = false,
     val fexPreset: String? = null,
     /** Steam only: games are stretched to fill the screen (null = not a Steam page). */
     val forceFullscreen: Boolean? = null,
@@ -132,6 +134,7 @@ class ModeSettingsActions(
     val onRenderer: (String) -> Unit,
     val onGameStorage: (path: String, label: String) -> Unit = { _, _ -> },
     val onPickGameStorageFolder: () -> Unit = {},
+    val onStorageDiagnostics: (Boolean) -> Unit = {},
     val onFexPreset: (String) -> Unit = {},
     val onForceFullscreen: (Boolean) -> Unit = {},
     val onGameTouch: (Boolean) -> Unit = {},
@@ -200,15 +203,14 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
                 onPick = a.onFpsLimit,
             )
             ChoiceRow(
-                host, "upscaler", "Upscaler", "Sharpens the picture where it is enlarged to the screen.",
+                host, "upscaler", stringResource(R.string.drawer_scaling), "How the picture is resized to the screen; the sharpening modes sharpen where it is enlarged.",
                 com.droiddeck.launcher.session.SessionPrefs.upscalerChoices, s.upscaler,
-                note = "Works only when the session is smaller than the screen; Sharpen only works at any size. Costs a little GPU time.",
+                note = "The sharpening modes work only when the session is smaller than the screen; Linear, Nearest and Sharpen only work at any size. Costs a little GPU time.",
                 onPick = a.onUpscaler,
             )
-            ChoiceRow(
-                host, "upscale-sharpness", "Upscaler sharpness", null,
-                com.droiddeck.launcher.session.SessionPrefs.upscaleSharpnessChoices, s.upscaleSharpness,
-                enabled = s.upscaler != 0, onPick = a.onUpscaleSharpness,
+            SliderRow(
+                stringResource(R.string.drawer_scaling_sharpness), null, s.upscaleSharpness, 0..100, step = 5,
+                enabled = s.upscaler != 0, format = { "$it%" }, onChange = a.onUpscaleSharpness,
             )
             if (editCustom) CustomResolutionDialog(
                 initial = custom,
@@ -232,7 +234,7 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
         SettingsGroup(if (steam) stringResource(R.string.mode_touch_controls) else stringResource(R.string.mode_touch)) {
             ChoiceRow(
                 host, "touch", stringResource(R.string.mode_touch), null,
-                listOf("auto" to stringResource(R.string.common_auto), "touchpad" to stringResource(R.string.mode_touch_touchpad), "direct" to stringResource(R.string.mode_touch_direct)), s.touchMode,
+                listOf(SessionPrefs.TOUCH_AUTO to stringResource(R.string.common_auto), SessionPrefs.TOUCH_PAD to stringResource(R.string.mode_touch_touchpad), SessionPrefs.TOUCH_DIRECT to stringResource(R.string.mode_touch_direct), SessionPrefs.TOUCH_OFF to stringResource(R.string.widgets_off)), s.touchMode,
                 note = stringResource(R.string.mode_touch_note),
                 onPick = a.onTouch,
             )
@@ -466,6 +468,11 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
                     }
                 }
             }
+            ToggleRow(
+                host, "storageDiagnostics", stringResource(R.string.mode_storage_diagnostics),
+                stringResource(R.string.mode_storage_diagnostics_hint), s.storageDiagnostics,
+                onChange = a.onStorageDiagnostics,
+            )
         }
         if (!steam && s.renderer != null) SettingsGroup(stringResource(R.string.mode_renderer)) {
             ChoiceRow(

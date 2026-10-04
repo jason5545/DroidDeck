@@ -151,6 +151,7 @@ class MainActivity : ComponentActivity() {
     private var gameTouch by mutableStateOf(true)
     private var stretch16x9 by mutableStateOf(false)
     private var launcherFullscreen by mutableStateOf(true)
+    private var animationsEnabled by mutableStateOf(true)
     private var storeEnabled by mutableStateOf(false)
     private var mic by mutableStateOf(false)
     private var wifiDiscovery by mutableStateOf(false)
@@ -316,6 +317,7 @@ class MainActivity : ComponentActivity() {
     private var backActionsInverted by mutableStateOf(false)
     private var renderer by mutableStateOf("vulkan")
     private var gameStorage by mutableStateOf("")
+    private var storageDiagnostics by mutableStateOf(false)
     private var storageOptions by mutableStateOf<List<Pair<String, String>>>(emptyList())
     private val pickGameStorage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
         if (r.resultCode == RESULT_OK) InAppFilePicker.pickedPath(r.data)?.let { path -> setGameStorage(path, GameStorage.labelFor(this, path)) }
@@ -477,6 +479,7 @@ class MainActivity : ComponentActivity() {
         steamGames = if (shortcutPicker) emptyList() else com.droiddeck.launcher.frontend.LibraryCache.load(this)
         backActionsInverted = SessionPrefs.backActionsInverted(this)
         launcherFullscreen = SessionPrefs.launcherFullscreen(this)
+        animationsEnabled = SessionPrefs.animationsEnabled(this)
         storeEnabled = SessionPrefs.storeEnabled(this)
         applyLauncherFullscreen()
         updates.start()
@@ -527,6 +530,7 @@ class MainActivity : ComponentActivity() {
                         phantomProcessStatus = phantomProcessStatus,
                         showPhantomGate = showPhantomGate,
                         launcherFullscreen = launcherFullscreen,
+                        animationsEnabled = animationsEnabled,
                         storeEnabled = storeEnabled,
                     ),
                     FrontEndActions(
@@ -642,6 +646,11 @@ class MainActivity : ComponentActivity() {
                             applyLauncherFullscreen()
                         },
                         onStoreEnabled = { on -> SessionPrefs.setStoreEnabled(this, on); storeEnabled = on },
+                        onAnimationsEnabled = { on ->
+                            SessionPrefs.setAnimationsEnabled(this, on)
+                            animationsEnabled = on
+                            com.droiddeck.launcher.ui.Motion.refresh(this)
+                        },
                         onHomeApp = { manageHomeApp() },
                         onHomeScreen = { on ->
                             HomeApp.setHomeScreenEnabled(this, on)
@@ -710,6 +719,10 @@ class MainActivity : ComponentActivity() {
                             onSize = { v -> ControllerPrefs.setSize(this, v); refreshController() },
                             onStickClick = { on -> ControllerPrefs.setStickClick(this, on); refreshController() },
                             onAdaptiveSticks = { on -> ControllerPrefs.setAdaptiveSticks(this, on); refreshController() },
+                            onRumble = { on -> ControllerPrefs.setRumble(this, on); refreshController() },
+                            onSteamButton = { on -> ControllerPrefs.setSteamButton(this, on); refreshController() },
+                            onQamButton = { on -> ControllerPrefs.setQamButton(this, on); refreshController() },
+                            onKeyboardButton = { on -> ControllerPrefs.setKeyboardButton(this, on); refreshController() },
                             onEditLayout = { startActivity(Intent(this, ControllerEditorActivity::class.java)) },
                             onResetLayout = { ControllerPrefs.resetAllLayouts(this); refreshController() },
                             onMapping = { settingsMode = null; showPerformance = false; showProtons = false; showComponents = false; showMapping = true },
@@ -1117,6 +1130,7 @@ class MainActivity : ComponentActivity() {
                 renderer = if (mode == SessionService.MODE_DESKTOP) renderer else null,
                 gameStorage = if (mode == SessionService.MODE_STEAM) gameStorage else null,
                 storageOptions = storageOptions,
+                storageDiagnostics = mode == SessionService.MODE_STEAM && storageDiagnostics,
                 fexPreset = if (mode == SessionService.MODE_STEAM) fexPreset else null,
                 steamChannel = if (mode == SessionService.MODE_STEAM) steamChannel else null,
                 steamDeckMode = mode == SessionService.MODE_STEAM && steamDeckMode,
@@ -1186,6 +1200,10 @@ class MainActivity : ComponentActivity() {
                 onGameStorage = { path, label -> setGameStorage(path, label) },
                 onPickGameStorageFolder = {
                     pickGameStorage.launch(InAppFilePicker.buildDirIntent(this, "Choose the game storage folder", gameStorage.ifEmpty { null }))
+                },
+                onStorageDiagnostics = { on ->
+                    SessionPrefs.setStorageDiagnosticsEnabled(this, on)
+                    storageDiagnostics = on
                 },
                 onFexPreset = { id -> SessionPrefs.setFexPreset(this, id); fexPreset = id },
                 onSteamChannel = { id -> SessionPrefs.setSteamChannel(this, id); steamChannel = id },
@@ -1319,6 +1337,7 @@ class MainActivity : ComponentActivity() {
         refreshWifiDiscovery()
         renderer = SessionPrefs.desktopRenderer(this)
         gameStorage = SessionPrefs.gameStorage(this)
+        storageDiagnostics = SessionPrefs.storageDiagnosticsEnabled(this)
         settingsMode = mode
         // The page opens at once, on what was last read; the slow part (driver files, a walk of the
         // added-games folders, the storage volumes) lands while it animates in.

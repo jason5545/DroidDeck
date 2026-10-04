@@ -8,22 +8,11 @@ A running game must be restarted. Native Linux games and Steam itself are outsid
 this editor's scope.
 
 The order is inherited process environment, selected FEX preset and built-in
-settings, shared edits, the runtime's known fixes for that game, then
-game-specific edits. Editor entries therefore win over matching Steam
-launch-option variables. **Remove** explicitly unsets a
+settings, shared edits, then game-specific edits. Editor entries therefore win
+over matching Steam launch-option variables. **Remove** explicitly unsets a
 variable. **Restore inherited settings** removes the override. **Reset this
 profile** clears only that profile's overrides. Values are literal strings, with
 no shell expansion; quotes are only needed when the consuming program expects them.
-
-## Known fixes
-
-Some games need settings on this runtime whatever the shared edits say.
-`KNOWN_FIXES` in `bannerlator-game-env` holds them per Steam app ID: environment
-entries, DLL overrides put ahead of any already set, and arguments added to the
-game's command line unless the launch options already name the first one. They
-apply to the game's launch even without a configuration file, and a game-specific
-edit, including **Remove**, still overrides them. Each entry's comment records
-what failed without it. Slay the Spire 2 (2868840) is the only one so far.
 
 ## Defaults and available suggestions
 
@@ -78,6 +67,13 @@ which reads that snapshot for each real game launch and uses `execvpe` to start
 Proton. Probe prefix `compatdata/0` and non-launch verbs are unchanged. Malformed
 configuration falls back to the inherited environment without evaluating its
 contents. Signed non-Steam prefix IDs are normalized to unsigned IDs.
+
+The published file also carries a `dxvkConfig` string the app's own file never
+has: the session menu's texture filtering (Effects page; `core/TextureFiltering`)
+as `d3d9/d3d11.samplerAnisotropy` and `samplerLodBias` options. The launcher
+appends it to `DXVK_CONFIG` after the profiles, so a user's own `DXVK_CONFIG`
+entry keeps its options. "Auto" texture sharpness is `-log2(panel / session)`,
+derived when the session is sized, and applies from the next launch.
 
 Upstream references: [VKD3D capability parsing](https://github.com/HansKristian-Work/vkd3d-proton/blob/master/libs/vkd3d/device.c),
 [VKD3D options](https://github.com/HansKristian-Work/vkd3d-proton#environment-variables),

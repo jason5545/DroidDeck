@@ -20,12 +20,69 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(env["REMOVE"], "inherited")
         self.assertEqual(MODULE["apply_config"](env, config, "43")["CUSTOM"], "shared")
 
+    def test_engine_fixes_follow_the_games_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            game = Path(tmp) / "Godot Game"
+            (game / "data_game_windows_x86_64").mkdir(parents=True)
+            for name in ("Game.exe", "Game.pck", "libsentry.windows.release.x86_64.dll", "data_game_windows_x86_64/coreclr.dll"):
+                (game / name).touch()
+            env, extra, notes = MODULE["engine_fixes"](str(game / "Game.exe"), [])
+            self.assertEqual(env["FEX_TSOENABLED"], "1")
+            self.assertEqual(env["FEX_MULTIBLOCK"], "0")
+            # Sentry's and tabtip's overrides both survive: two fixes, one variable.
+            self.assertEqual(env["WINEDLLOVERRIDES"], "libsentry.windows.release.x86_64=d;tabtip.exe=d")
+            self.assertEqual(extra, ["--rendering-driver", "vulkan"])
+            self.assertEqual(MODULE["engine_fixes"](str(game / "Game.exe"), ["--rendering-driver", "opengl3"])[1], [])
+            # A Godot game without Sentry still gets tabtip off.
+            plain = Path(tmp) / "Plain"
+            plain.mkdir()
+            for name in ("Plain.exe", "Plain.pck"):
+                (plain / name).touch()
+            self.assertEqual(MODULE["engine_fixes"](str(plain / "Plain.exe"), [])[0], {"WINEDLLOVERRIDES": "tabtip.exe=d"})
+            other = Path(tmp) / "Other"
+            other.mkdir()
+            (other / "Other.exe").touch()
+            self.assertEqual(MODULE["engine_fixes"](str(other / "Other.exe"), []), ({}, [], []))
+
+    def test_a_new_fix_only_needs_registering(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "Game.exe").touch()
+            (Path(tmp) / "engine.dll").touch()
+            check = lambda game: ({"ENGINE": "1"}, ["--flag"], "engine") if "engine.dll" in game.files else None
+            MODULE["FIXES"].append(check)
+            try:
+                self.assertEqual(MODULE["engine_fixes"](str(Path(tmp) / "Game.exe"), []), ({"ENGINE": "1"}, ["--flag"], ["engine"]))
+            finally:
+                MODULE["FIXES"].remove(check)
+
+    def test_engine_fixes_sit_between_shared_and_game_profiles(self):
+        env = {"WINEDLLOVERRIDES": "dxgi=n"}
+        fixes = {"FEX_MULTIBLOCK": "0", "WINEDLLOVERRIDES": "libsentry=d"}
+        config = {"version": 1, "shared": {"FEX_MULTIBLOCK": "1"}, "games": {"42": {"FEX_TSOENABLED": "0"}}}
+        result = MODULE["apply_config"](env, config, "42", {**fixes, "FEX_TSOENABLED": "1"})
+        self.assertEqual(result["FEX_MULTIBLOCK"], "0")
+        self.assertEqual(result["FEX_TSOENABLED"], "0")
+        self.assertEqual(result["WINEDLLOVERRIDES"], "dxgi=n;libsentry=d")
+
     def test_invalid_configuration_is_atomic(self):
         env = {"ORIGINAL": "unchanged"}
         for entries in ({"A": "ok", "BAD=KEY": "x"}, {"A": "bad\0value"}, {"A": 1}):
             with self.assertRaises(ValueError):
                 MODULE["apply_config"](env, {"version": 1, "shared": entries}, "42")
             self.assertEqual(env, {"ORIGINAL": "unchanged"})
+
+    def test_texture_filtering_is_appended_to_dxvk_config(self):
+        options = "d3d9.samplerAnisotropy = 16; d3d11.samplerAnisotropy = 16"
+        config = {"version": 1, "shared": {}, "games": {}, "dxvkConfig": options}
+        self.assertEqual(MODULE["apply_config"]({}, config, "42")["DXVK_CONFIG"], options)
+        own = {"DXVK_CONFIG": "dxvk.maxFrameRate = 60; "}
+        self.assertEqual(MODULE["apply_config"](own, config, "42")["DXVK_CONFIG"], "dxvk.maxFrameRate = 60; " + options)
+        shared = {"version": 1, "shared": {"DXVK_CONFIG": "dxvk.tearFree = True"}, "games": {}, "dxvkConfig": options}
+        self.assertEqual(MODULE["apply_config"]({}, shared, "42")["DXVK_CONFIG"], "dxvk.tearFree = True; " + options)
+        self.assertNotIn("DXVK_CONFIG", MODULE["apply_config"]({}, {**config, "dxvkConfig": ""}, "42"))
+        for bad in (1, "a\0b", "x" * 8193):
+            with self.assertRaises(ValueError):
+                MODULE["apply_config"]({}, {**config, "dxvkConfig": bad}, "42")
 
     def test_game_ids_and_probes(self):
         for prefix in ("", "/compatdata/0", "/compatdata/0-123", "/compatdata/nope", "/compatdata/4294967296"):
@@ -81,58 +138,6 @@ class GameEnvironmentTest(unittest.TestCase):
                     text=True, capture_output=True)
                 self.assertEqual(result.returncode, 7, result.stderr)
                 self.assertEqual(json.loads(result.stdout), ["specific", ["waitforexitandrun", "game with spaces.exe"]])
-
-    def test_known_fixes_sit_between_shared_and_game_entries(self):
-        config = {"version": 1,
-                  "shared": {"FEX_HALFBARRIERTSOENABLED": "0", "FEX_TSOENABLED": "1", "WINEDLLOVERRIDES": "dxgi=n"},
-                  "games": {"2868840": {"DOTNET_EnableWriteXorExecute": "1"}}}
-        env = MODULE["apply_config"]({"WINEDLLOVERRIDES": "d3d9=n"}, config, "2868840")
-        # Slay the Spire 2: the .NET entries, and tabtip off ahead of the overrides the shared entries
-        # chose; the user's own entry for the game beats the fix; nothing else is added.
-        self.assertEqual(env, {"FEX_HALFBARRIERTSOENABLED": "0", "FEX_TSOENABLED": "1",
-                               "WINEDLLOVERRIDES": "tabtip.exe=d;dxgi=n", "DOTNET_GCHeapHardLimit": "0x400000000",
-                               "DOTNET_EnableWriteXorExecute": "1", "DOTNET_TieredCompilation": "0"})
-        # Another title gets the shared entries only.
-        self.assertEqual(MODULE["apply_config"]({}, config, "42"),
-                         {"FEX_HALFBARRIERTSOENABLED": "0", "FEX_TSOENABLED": "1", "WINEDLLOVERRIDES": "dxgi=n"})
-        # The three layers, with a fix that sets entries: the fix beats the shared FEX preset, the
-        # user's own entry for the game beats the fix, and a user entry can take a fix's entry away.
-        fixes = MODULE["KNOWN_FIXES"]
-        fixes["42"] = {"env": {"FEX_HALFBARRIERTSOENABLED": "1", "DOTNET_TieredCompilation": "0"}}
-        try:
-            config["games"]["42"] = {"DOTNET_TieredCompilation": None, "FEX_TSOENABLED": "0"}
-            self.assertEqual(MODULE["apply_config"]({}, config, "42"),
-                             {"FEX_HALFBARRIERTSOENABLED": "1", "FEX_TSOENABLED": "0", "WINEDLLOVERRIDES": "dxgi=n"})
-        finally:
-            del fixes["42"]
-
-    def test_known_fix_arguments_and_launches_without_configuration(self):
-        self.assertEqual(MODULE["known_args"](["proton", "waitforexitandrun", "SlayTheSpire2.exe"], "2868840"),
-                         ["proton", "waitforexitandrun", "SlayTheSpire2.exe", "--rendering-driver", "vulkan"])
-        fixes = MODULE["KNOWN_FIXES"]
-        fixes["42"] = {"args": ["--rendering-driver", "vulkan"]}
-        try:
-            self.assertEqual(MODULE["known_args"](["proton", "waitforexitandrun", "game.exe"], "42"),
-                             ["proton", "waitforexitandrun", "game.exe", "--rendering-driver", "vulkan"])
-            chosen = ["proton", "waitforexitandrun", "game.exe", "--rendering-driver", "d3d12"]
-            self.assertEqual(MODULE["known_args"](chosen, "42"), chosen)
-        finally:
-            del fixes["42"]
-        self.assertEqual(MODULE["known_args"](["proton", "waitforexitandrun", "game.exe"], "43"),
-                         ["proton", "waitforexitandrun", "game.exe"])
-        with tempfile.TemporaryDirectory() as tmp:
-            probe = Path(tmp) / "fake-proton"
-            probe.write_text("#!/usr/bin/python3\nimport json, os, sys\nprint(json.dumps([os.environ.get('WINEDLLOVERRIDES'), sys.argv[1:]]))\n")
-            probe.chmod(0o755)
-            env = {**os.environ, "HOME": tmp, "STEAM_COMPAT_DATA_PATH": "/compatdata/2868840"}
-            env.pop("WINEDLLOVERRIDES", None)
-            run = lambda verb: json.loads(subprocess.check_output(
-                [sys.executable, str(BIN / "bannerlator-game-env"), str(probe), verb, "SlayTheSpire2.exe"],
-                env=env, text=True, stderr=subprocess.DEVNULL))
-            # No configuration file at all: the fix still applies to the game's launch, and only to it.
-            self.assertEqual(run("waitforexitandrun"),
-                             ["tabtip.exe=d", ["waitforexitandrun", "SlayTheSpire2.exe", "--rendering-driver", "vulkan"]])
-            self.assertEqual(run("run"), [None, ["run", "SlayTheSpire2.exe"]])
 
     def test_directaudio_selection_reaches_wine_and_leaves_when_off(self):
         good = "[Software\\\\Wine\\\\Drivers]"   # as Wine writes it: two backslashes between names

@@ -36,13 +36,17 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.droiddeck.launcher.core.FileUtils
+import com.droiddeck.launcher.core.TextureFiltering
 import com.droiddeck.launcher.files.InAppFilePicker
 import com.droiddeck.launcher.frontend.Library
 import com.droiddeck.launcher.gpu.FrameGen
+import com.droiddeck.launcher.gpu.ScreenEffectLooks
+import com.droiddeck.launcher.gpu.ScreenEffects
 import com.droiddeck.launcher.gpu.Lossless
 import com.droiddeck.launcher.gpu.TurnipDriver
 import com.droiddeck.launcher.input.EvdevKeys
 import com.droiddeck.launcher.input.KeyboardHost
+import com.droiddeck.launcher.input.ControllerPrefs
 import com.droiddeck.launcher.input.SessionClipboard
 import com.droiddeck.launcher.input.OnScreenControls
 import com.droiddeck.launcher.input.PadBridge
@@ -55,6 +59,7 @@ import com.droiddeck.launcher.runtime.LinuxRuntime
 import com.droiddeck.launcher.session.LoadingState
 import com.droiddeck.launcher.session.PerfHud
 import com.droiddeck.launcher.session.PerfMode
+import com.droiddeck.launcher.session.GameEnvironmentStore
 import com.droiddeck.launcher.session.SessionPrefs
 import com.droiddeck.launcher.session.SessionEvents
 import com.droiddeck.launcher.session.SessionArtifacts
@@ -132,6 +137,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
     }
     private var onScreenControls: OnScreenControls? = null
     private var keyboard: KeyboardHost? = null
+    private var controllerSettings by mutableStateOf<ControllerPrefs.Settings?>(null)
     private val sessionClipboard by lazy {
         SessionClipboard(this) {
             window.decorView.hasWindowFocus() || secondScreenPresentation?.window?.decorView?.hasWindowFocus() == true
@@ -209,6 +215,9 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
     private var gameTouch by mutableStateOf(true)
     private var upscaler by mutableStateOf(0)
     private var upscaleSharpness by mutableStateOf(75)
+    private var effects by mutableStateOf(ScreenEffects.OFF)
+    private var textureAnisotropy by mutableStateOf(0)
+    private var textureLodBias by mutableStateOf(TextureFiltering.LOD_BIAS_OFF)
     private var lossless by mutableStateOf(Lossless.State.NONE)
     private val pickLossless = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
         if (r.resultCode == RESULT_OK) InAppFilePicker.pickedFile(r.data)?.let { importLossless(it) }
@@ -333,7 +342,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
             uiHandler.removeCallbacks(cursorHide)
             cursorVisible = false
         }
-        onScreenControls = OnScreenControls(this, bridge).also { root.addView(it) }
+        onScreenControls = OnScreenControls(this, bridge, onKeyboard = ::togglePcKeyboard).also { root.addView(it) }
         keyboard = KeyboardHost(this).also { root.addView(it) }
         touchpad = TouchpadGestures(PointerGestures.slop(this), pointerListener)
         // One arrow, ours: Android draws a system pointer for a mouse over any window, and the
@@ -464,6 +473,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
                     fillScreen = if (SessionState.mode == SessionService.MODE_STEAM) fillScreen else null,
                     gameTouch = if (SessionState.mode == SessionService.MODE_STEAM) gameTouch else null,
                     upscaler = upscaler, upscaleSharpness = upscaleSharpness,
+                    effects = effects, textureAnisotropy = textureAnisotropy, textureLodBias = textureLodBias,
                     frameGen = frameGen,
                     lossless = lossless,
                     oscMode = oscMode, suspendPolicy = suspendPolicy, touchMode = touchMode,
@@ -478,11 +488,19 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
                     onUpscaler = { m ->
                         SessionPrefs.setUpscaler(this@SessionActivity, m); upscaler = m
                         WaylandCompositor.nativeSetUpscaler(m)
+                        // Two Looks carry a scaling mode of their own, so the mode decides which one the log names.
+                        WaylandCompositor.nativeSetLookName(ScreenEffectLooks.match(effects, m)?.name)
                     },
                     onUpscaleSharpness = { pct ->
                         SessionPrefs.setUpscaleSharpness(this@SessionActivity, pct); upscaleSharpness = pct
                         WaylandCompositor.nativeSetUpscaleSharpness(pct)
                     },
+                    onEffects = { e ->
+                        SessionPrefs.setScreenEffects(this@SessionActivity, e); effects = e
+                        e.push(upscaler)
+                    },
+                    onTextureAnisotropy = { v -> SessionPrefs.setTextureAnisotropy(this@SessionActivity, v); textureAnisotropy = v },
+                    onTextureLodBias = { v -> SessionPrefs.setTextureLodBias(this@SessionActivity, v); textureLodBias = v },
                     onFrameGenPick = { mode ->
                         FrameGen.set(this@SessionActivity, mode)
                         readPrefs()
@@ -493,7 +511,12 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
                             this@SessionActivity, listOf("dll"), getString(R.string.lsfg_pick_title)))
                     },
                     onKeyboard = { drawerOpen = false; pcKeyboardOpen = false; keyboard?.toggle() },
-                    onHardwareKeyboard = { drawerOpen = false; pcKeyboardOpen = !pcKeyboardOpen },
+                    onHardwareKeyboard = ::togglePcKeyboard,
+                    controller = controllerSettings,
+                    onRumble = { on -> updateControllerPrefs { ControllerPrefs.setRumble(this@SessionActivity, on) } },
+                    onSteamButton = { on -> updateControllerPrefs { ControllerPrefs.setSteamButton(this@SessionActivity, on) } },
+                    onQamButton = { on -> updateControllerPrefs { ControllerPrefs.setQamButton(this@SessionActivity, on) } },
+                    onKeyboardButton = { on -> updateControllerPrefs { ControllerPrefs.setKeyboardButton(this@SessionActivity, on) } },
                     onSteamMenu = if (SessionState.mode == SessionService.MODE_STEAM) ({ sendSteamGuide() }) else null,
                     onQam = if (SessionState.mode == SessionService.MODE_STEAM) ({ triggerSteamQam() }) else null,
                     backActionsInverted = backActionsInverted,
@@ -585,6 +608,19 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
     private fun triggerSteamQam() {
         drawerOpen = false
         padBridge?.triggerQam()
+    }
+
+    private fun togglePcKeyboard() {
+        drawerOpen = false
+        keyboard?.hide()
+        onScreenControls?.releaseAll()
+        pcKeyboardOpen = !pcKeyboardOpen
+    }
+
+    private fun updateControllerPrefs(change: () -> Unit) {
+        change()
+        controllerSettings = ControllerPrefs.read(this)
+        onScreenControls?.reload()
     }
 
     private fun routeBackAction() {
@@ -705,7 +741,21 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         gameTouch = SessionPrefs.gameTouch(this)
         upscaler = SessionPrefs.upscaler(this)
         upscaleSharpness = SessionPrefs.upscaleSharpness(this)
-        touchMode = SessionPrefs.touchMode(this)
+        effects = SessionPrefs.screenEffects(this)
+        textureAnisotropy = SessionPrefs.textureAnisotropy(this)
+        textureLodBias = SessionPrefs.textureLodBias(this)
+        val nextTouchMode = SessionPrefs.touchMode(this)
+        if (touchMode != nextTouchMode) {
+            if (::touchpad.isInitialized) touchpad.cancel()
+            if (CompositorHost.isStarted) {
+                WaylandCompositor.nativeSendTouch(3, -1, 0, 0)
+                listOf(PointerGestures.BTN_LEFT, PointerGestures.BTN_RIGHT, PointerGestures.BTN_MIDDLE).forEach {
+                    WaylandCompositor.nativeSendSceneInput(3, it, 0)
+                }
+            }
+            if (nextTouchMode == SessionPrefs.TOUCH_OFF) cursorVisible = false
+        }
+        touchMode = nextTouchMode
         frameGen = FrameGen.mode(this)
         fexPreset = SessionPrefs.fexPreset(this)
         suspendPolicy = SessionPrefs.suspendPolicy(this, SessionState.mode)
@@ -858,11 +908,20 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         val size = if (SessionState.running) SessionState.outputSize else outputSize()
         SessionState.outputSize = size
         if (!SessionState.running) SessionState.refreshHz = refreshHz()
+        // How far the panel enlarges the session, for texture sharpness "Auto" (TextureFiltering):
+        // the game environment is published again so the next launch derives it from this session.
+        val panel = panelBounds()
+        SessionState.upscaleRatio = maxOf(panel.width(), panel.height()).toFloat() / maxOf(size.first, size.second).coerceAtLeast(1)
+        Thread({
+            runCatching { GameEnvironmentStore.publish(this) }
+                .onFailure { Log.e(TAG, "Could not update game environment", it) }
+        }, "game-env-publish").start()
         // Letterbox, never stretch or crop: the output can be a different shape from the panel,
         // and a game's picture must keep its proportions with bars, not lose its edges.
         WaylandCompositor.nativeSetScaleMode(SCALE_FIT, ALIGN_CENTER)
         WaylandCompositor.nativeSetUpscaler(SessionPrefs.upscaler(this))
         WaylandCompositor.nativeSetUpscaleSharpness(SessionPrefs.upscaleSharpness(this))
+        SessionPrefs.screenEffects(this).push(SessionPrefs.upscaler(this))
         // The session's folder, claimed here because the compositor starts before the service and
         // opens its log once. The compositor reads the path from its environment; setting it after
         // it has started changes nothing, which is why the service copies the file in at teardown.
@@ -911,7 +970,6 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         // whole process, so the second Play after a session ended used to re-attach the Surface,
         // start nothing, and leave the loading panel counting up over a dead session.
         if (!SessionState.running) {
-            CompositorHost.newSession()
             SessionEvents.transition(SessionPhase.STARTING_GUEST, "guest.starting")
             SessionService.start(
                 this, intent.getStringExtra(SessionService.EXTRA_MODE) ?: SessionService.MODE_STEAM,
@@ -947,17 +1005,18 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
      * The size the session renders at. gamescope is told this and scales its output onto whatever
      * the panel is, so a 1440p phone can run the client at 1080p without the client knowing.
      */
+    /** The panel, not the window: resources.displayMetrics is what is left after the system bars and the cutout are taken out. */
+    private fun panelBounds(): android.graphics.Rect = if (Build.VERSION.SDK_INT >= 30) {
+        windowManager.maximumWindowMetrics.bounds
+    } else {
+        val metrics = android.util.DisplayMetrics()
+        @Suppress("DEPRECATION")
+        windowManager.defaultDisplay.getRealMetrics(metrics)
+        android.graphics.Rect(0, 0, metrics.widthPixels, metrics.heightPixels)
+    }
+
     private fun outputSize(): Pair<Int, Int> {
-        // The panel, not the window: resources.displayMetrics is what is left after the system
-        // bars and the cutout are taken out.
-        val bounds = if (Build.VERSION.SDK_INT >= 30) {
-            windowManager.maximumWindowMetrics.bounds
-        } else {
-            val metrics = android.util.DisplayMetrics()
-            @Suppress("DEPRECATION")
-            windowManager.defaultDisplay.getRealMetrics(metrics)
-            android.graphics.Rect(0, 0, metrics.widthPixels, metrics.heightPixels)
-        }
+        val bounds = panelBounds()
         val panelW = maxOf(bounds.width(), bounds.height()).toFloat()
         val panelH = minOf(bounds.width(), bounds.height()).toFloat()
         // Never narrower than 16:9. A foldable's inner panel is nearly square, and a game handed a
@@ -1575,6 +1634,8 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.isFromSource(android.view.InputDevice.SOURCE_MOUSE)) return onMouse(event)
+        // Child views get the event first, so menus, keyboards and the on-screen pad still work.
+        if (touchMode == SessionPrefs.TOUCH_OFF) return true
         if (usingTouchpad()) {
             val rect = drawnRect() ?: return false
             if (touchpad.bounds != rect) {
@@ -1800,6 +1861,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         (getSystemService(INPUT_SERVICE) as? InputManager)
             ?.registerInputDeviceListener(deviceListener, Handler(Looper.getMainLooper()))
         onScreenControls?.reload()
+        controllerSettings = ControllerPrefs.read(this)
         updateOnScreenControls()
         resumed = true
         if (!pipUi) sessionClipboard.start()
