@@ -15,7 +15,7 @@
 
 `tools/build_local.sh` 要 Docker 和 x86 模擬，在 Apple Silicon 上很慢。只改 Kotlin／Java 或 `tools/linuxfs` 腳本時，改用 upstream 同一個 commit 的 CI 產物當原生素材：
 
-1. `gh run download <run id> -R Droid-Deck/DroidDeck -n droiddeck-apk`，跟本地 HEAD 同一個 commit 的那次 Build APK。目前對應的是 upstream `26cb9e2` 的 run 37223328336。runtime 另外下載的部分（例如 #158 的 `tools/linuxfs/preload/storage.c`）不在 APK 裡，本地 build 不受影響。
+1. `gh run download <run id> -R Droid-Deck/DroidDeck -n droiddeck-apk`，跟本地 HEAD 同一個 commit 的那次 Build APK。目前對應的是 upstream `beb96e6` 的 run 37246794175。runtime 另外下載的部分（例如 #158 的 `tools/linuxfs/preload/storage.c`）不在 APK 裡，本地 build 不受影響。
 2. 先刪掉 `app/src/main/assets/linuxfs/` 和 `app/src/main/assets/droiddeck-esync/`（都在 .gitignore 裡，上一次解出來的舊檔會留著，例如改名前的 `bannerlator-*`），再把 APK 裡的 `assets/linuxfs/` 和 `assets/droiddeck-esync/` 解到 `app/src/main/assets/` 底下對應的位置、`lib/arm64-v8a/libproot*.so` 放進 `app/src/main/jniLibs/arm64-v8a/`、`assets/pulseaudio.tzst` 蓋過同名檔（這個檔有進版控，build 完要 `git checkout` 還原）。`droiddeck-esync` 是 CI 另外打包的 esync 套件，本機 build 沒有它，APK 就少了內建套件。
 3. 改到 `tools/linuxfs/desktop/` 的檔案要手動複製進 `app/src/main/assets/linuxfs/usr/local/bin/`，Gradle 只會同步 `tools/linuxfs/overlay` 底下的 `droiddeck-*`、`steam-compatibility` 和 `usr/bin`。
 4. `JAVA_HOME` 指向 openjdk@17，`./gradlew assembleRelease -PndkVersion=<已裝的 NDK>`，產物已經是 testkey 簽名。
