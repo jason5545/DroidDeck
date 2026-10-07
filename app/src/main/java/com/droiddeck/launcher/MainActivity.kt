@@ -154,8 +154,7 @@ class MainActivity : ComponentActivity() {
     private var phantomProcessStatus by mutableStateOf(PhantomProcessStatus.NOT_APPLICABLE)
     private var showPhantomGate by mutableStateOf(false)
     private var directAudio by mutableStateOf(false)
-    private var clientDirectAudio by mutableStateOf(false)
-    private var forceFullscreen by mutableStateOf(false)
+    private var clientDirectAudio by mutableStateOf(true)
     private var stretch16x9 by mutableStateOf(false)
     private var launcherFullscreen by mutableStateOf(true)
     private var animationsEnabled by mutableStateOf(true)
@@ -311,6 +310,7 @@ class MainActivity : ComponentActivity() {
     private var settingsMode by mutableStateOf<String?>(null)
     private var resolution by mutableStateOf(com.droiddeck.launcher.session.SessionDisplay.DEFAULT_RESOLUTION)
     private var fexPreset by mutableStateOf("")
+    private var forceSsbs by mutableStateOf(false)
     private var steamChannel by mutableStateOf("steamdeck_publicbeta")
     private var runSteamAtStartup by mutableStateOf(false)
     private var theme by mutableStateOf("graphite")
@@ -440,7 +440,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun launchGame(game: Library.SteamGame): Boolean {
+    private fun launchGame(game: Library.SteamGame, returnHome: Boolean = false): Boolean {
         if (protons.protonBusyId != null || ProtonExtras.installInProgress || pkgStage != null) {
             android.widget.Toast.makeText(this, "Wait for the install to finish before launching a game", android.widget.Toast.LENGTH_SHORT).show()
             return false
@@ -455,10 +455,12 @@ class MainActivity : ComponentActivity() {
                 return false
             }
             startActivity(Intent(this, SessionActivity::class.java).setAction(SessionService.ACTION_RESUME)
+                .putExtra(SessionActivity.EXTRA_RETURN_HOME, returnHome)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
             return true
         }
         return startSession(Intent(this, SessionActivity::class.java)
+                .putExtra(SessionActivity.EXTRA_RETURN_HOME, returnHome)
                 .putExtra(SessionService.EXTRA_STEAM_URL,
                 com.droiddeck.launcher.frontend.GameLaunchLink.steamUrl(game.gameIdString)), steamSession = true)
     }
@@ -473,7 +475,7 @@ class MainActivity : ComponentActivity() {
             intent.action = Intent.ACTION_MAIN
             intent.removeExtra(GameLaunchIntent.EXTRA_APP_ID)
             android.widget.Toast.makeText(this, R.string.game_link_missing, android.widget.Toast.LENGTH_LONG).show()
-        } else if (launchGame(game)) {
+        } else if (launchGame(game, returnHome = true)) {
             pendingGameLink = null
             intent.data = null
             intent.action = Intent.ACTION_MAIN
@@ -636,13 +638,10 @@ class MainActivity : ComponentActivity() {
                             logsEnabled = SessionPrefs.logsEnabled(this)
                         },
                         onShareLogs = {
-                            Thread({
-                                val zip = runCatching { SessionLogShare.zipLatest(this) }.getOrNull()
-                                ui.post {
-                                    if (zip == null) android.widget.Toast.makeText(this, "No session logs yet: run a session first.", android.widget.Toast.LENGTH_LONG).show()
-                                    else startActivity(SessionLogShare.shareIntent(this, zip))
-                                }
-                            }, "share-logs").start()
+                            SessionLogShare.prepare(this, { SessionLogShare.latest(this) }) { zip ->
+                                if (zip == null) android.widget.Toast.makeText(this, "No session logs yet: run a session first.", android.widget.Toast.LENGTH_LONG).show()
+                                else startActivity(SessionLogShare.shareIntent(this, zip))
+                            }
                         },
                         onClearLogs = {
                             Thread({
@@ -1149,7 +1148,6 @@ class MainActivity : ComponentActivity() {
                 backActionsInverted = backActionsInverted,
                 directAudio = if (mode == SessionService.MODE_STEAM) directAudio else null,
                 clientDirectAudio = clientDirectAudio,
-                forceFullscreen = if (mode == SessionService.MODE_STEAM) forceFullscreen else null,
                 stretch16x9 = if (mode == SessionService.MODE_STEAM) stretch16x9 else null,
                 mic = if (mode == SessionService.MODE_STEAM) mic else null,
                 renderer = if (mode == SessionService.MODE_DESKTOP) renderer else null,
@@ -1157,6 +1155,7 @@ class MainActivity : ComponentActivity() {
                 storageOptions = storageOptions,
                 storageDiagnostics = mode == SessionService.MODE_STEAM && storageDiagnostics,
                 fexPreset = if (mode == SessionService.MODE_STEAM) fexPreset else null,
+                forceSsbs = forceSsbs,
                 syncBackend = if (mode == SessionService.MODE_STEAM) SessionPrefs.syncBackendOf(fastSync, fsyncFirst, syncFallback) else null,
                 steamChannel = if (mode == SessionService.MODE_STEAM) steamChannel else null,
                 steamDeckMode = mode == SessionService.MODE_STEAM && steamDeckMode,
@@ -1209,7 +1208,6 @@ class MainActivity : ComponentActivity() {
                 },
                 onDirectAudio = { on -> SessionPrefs.setDirectAudio(this, on); directAudio = on },
                 onClientDirectAudio = { on -> SessionPrefs.setClientDirectAudio(this, on); clientDirectAudio = on },
-                onForceFullscreen = { on -> SessionPrefs.setForceFullscreen(this, on); forceFullscreen = on },
                 onStretch16x9 = { on -> SessionPrefs.setStretch16x9(this, on); stretch16x9 = on },
                 onMic = { on ->
                     SessionPrefs.setMicEnabled(this, on)
@@ -1230,6 +1228,7 @@ class MainActivity : ComponentActivity() {
                     storageDiagnostics = on
                 },
                 onFexPreset = { id -> SessionPrefs.setFexPreset(this, id); fexPreset = id },
+                onForceSsbs = { on -> SessionPrefs.setForceSsbs(this, on); forceSsbs = on },
                 onSyncBackend = { id ->
                     SessionPrefs.setSyncBackend(this, id)
                     fastSync = SessionPrefs.fastSync(this)
@@ -1351,6 +1350,7 @@ class MainActivity : ComponentActivity() {
         showMapping = false
         resolution = SessionPrefs.resolutionChoice(this, mode, com.droiddeck.launcher.session.SessionDisplay.panelSize(this))
         fexPreset = SessionPrefs.fexPreset(this)
+        forceSsbs = SessionPrefs.forceSsbs(this)
         fastSync = SessionPrefs.fastSync(this)
         fsyncFirst = SessionPrefs.fsyncFirst(this)
         syncFallback = SessionPrefs.syncFallback(this)
@@ -1372,7 +1372,6 @@ class MainActivity : ComponentActivity() {
         backActionsInverted = SessionPrefs.backActionsInverted(this)
         directAudio = SessionPrefs.directAudio(this)
         clientDirectAudio = SessionPrefs.clientDirectAudio(this)
-        forceFullscreen = SessionPrefs.forceFullscreen(this)
         stretch16x9 = SessionPrefs.stretch16x9(this)
         mic = SessionPrefs.micEnabled(this)
         refreshWifiDiscovery()

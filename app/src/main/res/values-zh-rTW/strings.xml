@@ -263,6 +263,8 @@
     <string name="mode_suspend">背景行為</string>
     <string name="mode_suspend_hint">App 被隱藏或螢幕關閉時。</string>
     <string name="mode_suspend_manual">手動</string>
+    <string name="mode_suspend_native">原生</string>
+    <string name="mode_suspend_steam_note">自動：在背景時暫停，回到前景時繼續。原生：先讓 Steam 準備睡眠。手動：等你按「繼續」。永不：持續執行。</string>
     <string name="mode_suspend_note">自動：在背景時暫停，回到前景時繼續。手動：等你按「繼續」。永不：持續執行。</string>
     <string name="mode_startup">啟動</string>
     <string name="mode_steam_startup">開啟 DroidDeck 時啟動 Steam</string>
@@ -305,8 +307,29 @@
     <string name="mode_added_launches_in">啟動 %1$s · 位於 %2$s</string>
     <string name="mode_added_choose">選擇其他檔案…</string>
     <string name="mode_added_exe_note">預設用跟資料夾同名的 .exe，沒有的話用最大的那個。</string>
-    <string name="mode_fill">把遊戲拉伸到填滿螢幕</string>
-    <string name="mode_fill_hint">讓會自己調整大小的遊戲維持全螢幕。如果遊戲顯示得很小，請關閉。下次工作階段生效。</string>
+    <string name="wincomp_title">Windows 元件</string>
+    <string name="wincomp_pad_hint">用 LB／RB 在各區之間跳轉。</string>
+    <string name="wincomp_card_none">無</string>
+    <string name="wincomp_applies">Proton 沒有附的 Windows DLL，來自 Bannerlator 的元件清單。打開這個遊戲需要的：它們會放進遊戲自己的 Windows 資料夾，不動遊戲檔案，換哪個 Proton 執行都會保留。</string>
+    <string name="wincomp_offline">無法連上元件清單。已下載的元件仍然可以切換。</string>
+    <string name="wincomp_recommended">建議這個遊戲使用</string>
+    <string name="wincomp_found_bundled">遊戲附有 %1$s</string>
+    <string name="wincomp_found_shipped">遊戲裡有 %1$s（通常可以直接用）</string>
+    <string name="wincomp_found_steam">Steam 會隨這個遊戲安裝 %1$s</string>
+    <string name="wincomp_already_here">遊戲裡已經有</string>
+    <string name="wincomp_no_recommendation">遊戲資料夾裡沒有任何檔案指向某個元件。</string>
+    <string name="wincomp_all">所有元件（%1$d）</string>
+    <string name="wincomp_installers">需要 Windows 安裝程式（%1$d）</string>
+    <string name="wincomp_installers_note">這些要在 prefix 裡執行真正的安裝程式（.NET、PhysX、XNA、完整的 Visual C++ 安裝程式…）。DroidDeck 目前還做不到，下一步就會支援。</string>
+    <string name="wincomp_show">顯示</string>
+    <string name="wincomp_hide">隱藏</string>
+    <string name="wincomp_needs_installer">需要 Windows 安裝程式（即將支援）</string>
+    <string name="wincomp_unsupported">這裡還不支援</string>
+    <string name="wincomp_loading">正在載入元件…</string>
+    <string name="wincomp_failed">無法安裝：%1$s</string>
+    <string name="wincomp_downloaded">已下載</string>
+    <string name="wincomp_download_size">下載 %1$s</string>
+    <string name="wincomp_next_launch">下次啟動遊戲時生效。</string>
     <string name="mode_stretch169">拉伸 16:9 遊戲</string>
     <string name="mode_stretch169_hint">在比 16:9 更接近方形的螢幕上，把遊戲拉伸到填滿，不顯示黑邊。下次工作階段生效。</string>
     <string name="mode_audio">音訊</string>
@@ -484,7 +507,6 @@
     <string name="drawer_prev_page">上一頁</string>
     <string name="drawer_next_page">下一頁</string>
     <string name="drawer_hud">效能 HUD</string>
-    <string name="drawer_fill">把遊戲拉伸到填滿</string>
     <string name="drawer_scaling">縮放模式</string>
     <string name="drawer_scaling_sharpness">縮放銳利度</string>
     <string name="drawer_effects">畫面效果</string>
@@ -1033,10 +1055,6 @@
     <string name="display_filter_note">FSR、GSR 和 NIS 只在放大工作階段畫面時作用。Sharpen only 不放大也有效。</string>
     <string name="display_sharpness">濾鏡銳利度</string>
     <string name="display_frame_rate">畫面更新率</string>
-    <string name="display_window_compatibility">遊戲視窗相容性</string>
-    <string name="display_force_fullscreen">強制遊戲視窗全螢幕</string>
-    <string name="display_force_fullscreen_hint">讓每個遊戲視窗都跟螢幕一樣大。切換 App 後遊戲變小或縮在角落時開啟；遊戲在兩種大小之間閃爍時關閉。工作階段中即時套用。</string>
-    <string name="display_force_fullscreen_live">切換後遊戲變小時開啟，會閃爍時關閉。即時套用。</string>
     <string name="display_look_filter">%1$s 縮放會設為 %2$s。</string>
     <string name="display_match_screen">符合螢幕（%1$d×%2$d）</string>
     <string name="mode_tab_steam">Steam</string>
@@ -1046,4 +1064,6 @@
     <string name="device_info_copy">複製</string>
     <string name="device_info_copy_hint">複製這些資料，貼進錯誤回報。</string>
     <string name="device_info_copied">已複製。</string>
+    <string name="force_ssbs_title">強制 SSBS</string>
+    <string name="force_ssbs_hint">讓 Wine 一直關掉的一項 CPU 速度設定保持開啟。在 Snapdragon 8 Elite 上可以讓 Windows 遊戲變快；較舊的晶片看不出什麼差別。下次啟動遊戲時生效。</string>
 </resources>

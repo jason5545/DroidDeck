@@ -62,7 +62,7 @@ class ModeSettings(
     /** Steam only: whether single and double Back actions are swapped. */
     val backActionsInverted: Boolean = false,
     val directAudio: Boolean?,
-    val clientDirectAudio: Boolean = false,
+    val clientDirectAudio: Boolean = true,
     val mic: Boolean?,
     val renderer: String?,
     val gameStorage: String? = null,
@@ -70,10 +70,10 @@ class ModeSettings(
     /** Steam only: record allocation and sampled storage timings in the next session's Share logs. */
     val storageDiagnostics: Boolean = false,
     val fexPreset: String? = null,
+    /** Steam only: Force SSBS for Proton games (SessionPrefs.forceSsbs). */
+    val forceSsbs: Boolean = false,
     /** Steam only: SessionPrefs.SYNC_* chosen for Proton games; null outside Steam. */
     val syncBackend: String? = null,
-    /** Steam only: forces game windows fullscreen (null = not a Steam page). */
-    val forceFullscreen: Boolean? = null,
     val stretch16x9: Boolean? = null,
     /** Steam only: the client branch forced on the command line. */
     val steamChannel: String? = null,
@@ -131,8 +131,8 @@ class ModeSettingsActions(
     val onPickGameStorageFolder: () -> Unit = {},
     val onStorageDiagnostics: (Boolean) -> Unit = {},
     val onFexPreset: (String) -> Unit = {},
+    val onForceSsbs: (Boolean) -> Unit = {},
     val onSyncBackend: (String) -> Unit = {},
-    val onForceFullscreen: (Boolean) -> Unit = {},
     val onStretch16x9: (Boolean) -> Unit = {},
     val onSteamChannel: (String) -> Unit = {},
     val onSteamRepair: () -> Unit = {},
@@ -288,9 +288,9 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
                         SessionPrefs.SUSPEND_AUTO to stringResource(R.string.common_auto),
                         SessionPrefs.SUSPEND_MANUAL to stringResource(R.string.mode_suspend_manual),
                         SessionPrefs.SUSPEND_NEVER to stringResource(R.string.common_never),
-                    ),
+                    ) + if (steam) listOf(SessionPrefs.SUSPEND_NATIVE to stringResource(R.string.mode_suspend_native)) else emptyList(),
                     s.suspendPolicy,
-                    note = stringResource(R.string.mode_suspend_note),
+                    note = stringResource(if (steam) R.string.mode_suspend_steam_note else R.string.mode_suspend_note),
                     onPick = a.onSuspendPolicy,
                 )
             }
@@ -410,10 +410,6 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
                 }
             }
         }
-        if ((tab == ModeSettingsTab.GAMES || (!steam && tab == ModeSettingsTab.DISPLAY)) && s.forceFullscreen != null) SettingsGroup(stringResource(R.string.display_window_compatibility)) {
-            ToggleRow(host, "fill", stringResource(R.string.display_force_fullscreen),
-                stringResource(R.string.display_force_fullscreen_hint), s.forceFullscreen, onChange = a.onForceFullscreen)
-        }
         if (steam && tab == ModeSettingsTab.GAMES && s.addedGamesDirs != null) SettingsGroup(stringResource(R.string.mode_added_games)) {
             for (dir in s.addedGamesDirs) {
                 val n = s.addedGames.count { it.folderPath.startsWith("$dir/") }
@@ -432,12 +428,14 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
                 stringResource(R.string.mode_added_art_hint),
                 s.addedGamesArt, onChange = a.onAddedGamesArt,
             )
-            for (g in s.addedGames) ChoiceRow(
-                host, "added:" + g.folderPath, g.folderName, if (s.addedGamesDirs.size > 1) stringResource(R.string.mode_added_launches_in, g.exeName, g.folderPath.substringBeforeLast('/').substringAfterLast('/')) else stringResource(R.string.mode_added_launches, g.exeName),
-                g.candidates + ("__pick__" to stringResource(R.string.mode_added_choose)), g.exePath,
-                note = stringResource(R.string.mode_added_exe_note),
-                onPick = { path -> if (path == "__pick__") a.onPickAddedGameExe(g.folderPath) else a.onAddedGameExe(g.folderPath, path) },
-            )
+            for (g in s.addedGames) {
+                ChoiceRow(
+                    host, "added:" + g.folderPath, g.folderName, if (s.addedGamesDirs.size > 1) stringResource(R.string.mode_added_launches_in, g.exeName, g.folderPath.substringBeforeLast('/').substringAfterLast('/')) else stringResource(R.string.mode_added_launches, g.exeName),
+                    g.candidates + ("__pick__" to stringResource(R.string.mode_added_choose)), g.exePath,
+                    note = stringResource(R.string.mode_added_exe_note),
+                    onPick = { path -> if (path == "__pick__") a.onPickAddedGameExe(g.folderPath) else a.onAddedGameExe(g.folderPath, path) },
+                )
+            }
         }
         if (steam && tab == ModeSettingsTab.GAMES && s.fexPreset != null) SettingsGroup(stringResource(R.string.game_settings_title)) {
             if (s.syncBackend != null) SettingsRow(
@@ -459,6 +457,7 @@ fun ModeSettingsPage(s: ModeSettings, a: ModeSettingsActions) {
                 FexPreset.all.map { it.id to stringResource(it.label) }, s.fexPreset,
                 note = stringResource(FexPreset.byId(s.fexPreset).detail), onPick = a.onFexPreset,
             )
+            ToggleRow(host, "ssbs", stringResource(R.string.force_ssbs_title), stringResource(R.string.force_ssbs_hint), s.forceSsbs, onChange = a.onForceSsbs)
             GameEnvironmentRow()
 
         }

@@ -8,6 +8,7 @@ import org.json.JSONObject
 /** The in-session switches: the HUD and how the on-screen controls decide to appear. */
 object SessionPrefs {
     const val SUSPEND_AUTO = "auto"
+    const val SUSPEND_NATIVE = "native"
     const val SUSPEND_MANUAL = "manual"
     const val SUSPEND_NEVER = "never"
 
@@ -90,7 +91,7 @@ object SessionPrefs {
      * nothing but the controller in game. While touch is direct (Direct, or Auto, which is direct
      * in Steam) the session answers that with a left-click mouse - a tap clicks where it lands.
      * Touchpad and Off send the guest no touches, so the client's choice stands. Changed live
-     * through a file the session watches, like [writeForceFullscreenFlag].
+     * through a file the session watches (~/.droiddeck-game-touch).
      */
     fun gameTouch(context: Context): Boolean = touchMode(context).let { it == TOUCH_AUTO || it == TOUCH_DIRECT }
 
@@ -173,29 +174,12 @@ object SessionPrefs {
 
     /**
      * The Steam client's own sound through the DirectAudio relay instead of the classic AAudio
-     * sink. Off by default: on an AYN Thor (Android 13, 20 ms bursts) the relay path stayed choppy
-     * where the classic sink - the one 0.1.5 shipped - was fine.
+     * sink. On unless the user picked Classic.
      */
-    fun clientDirectAudio(context: Context): Boolean = prefs(context).getBoolean("clientDirectAudio", false)
+    fun clientDirectAudio(context: Context): Boolean = prefs(context).getBoolean("clientDirectAudio", true)
 
     fun setClientDirectAudio(context: Context, on: Boolean) {
         prefs(context).edit().putBoolean("clientDirectAudio", on).apply()
-    }
-
-    /**
-     * Steam only: gamescope makes every game window the size of the screen. A game that resizes
-     * its own window when it loses focus (FlatOut) otherwise comes back smaller, drawn in a
-     * corner; a game that sets its own resolution and never looks at its window again (Quake 3)
-     * instead draws small in the bottom-left of the stretched one. A game whose resolution differs
-     * from the screen's (DiRT 3 at 1280x720) fights it: it rebuilds its swapchain on every forced
-     * resize and the picture flickers between its own size and the screen's, often from the first
-     * menu, before the player can reach its resolution setting. Off unless turned on.
-     */
-    fun forceFullscreen(context: Context): Boolean = prefs(context).getBoolean("forceFullscreen", false)
-
-    fun setForceFullscreen(context: Context, on: Boolean) {
-        prefs(context).edit().putBoolean("forceFullscreen", on).apply()
-        writeForceFullscreenFlag(context)
     }
 
     fun stretch16x9(context: Context): Boolean = prefs(context).getBoolean("stretch16x9", false)
@@ -204,18 +188,6 @@ object SessionPrefs {
         prefs(context).edit().putBoolean("stretch16x9", on).apply()
     }
 
-    /**
-     * The same choice as a file the running session watches, so the drawer can change it live:
-     * the session hands every change to gamescope, which reads GAMESCOPE_FORCE_WINDOWS_FULLSCREEN
-     * off its root window whenever it changes. Written again at every session start so a file left
-     * by an earlier session never disagrees with the setting.
-     */
-    fun writeForceFullscreenFlag(context: Context) {
-        runCatching {
-            java.io.File(com.droiddeck.launcher.runtime.LinuxRuntime.rootDir(context), "root/.droiddeck-fill")
-                .writeText(if (forceFullscreen(context)) "1\n" else "0\n")
-        }
-    }
 
     /**
      * DirectAudio for games: their Wine audio driver talks to the relay helper on this side. On
@@ -533,7 +505,7 @@ object SessionPrefs {
     fun resolutionChoice(context: Context, mode: String, panel: Pair<Int, Int>): String {
         val saved = prefs(context)
         saved.getString("displayResolution.$mode", null)?.let { value ->
-            if (value == SessionDisplay.MATCH_SCREEN) return value
+            if (value == SessionDisplay.MATCH_SCREEN || SessionDisplay.presetHeight(value) != null) return value
             parseResolution(value)?.let { return "${it.first}x${it.second}" }
         }
         if (!resolutionChosen(context, mode) && !saved.contains("shape")) return SessionDisplay.DEFAULT_RESOLUTION
@@ -543,7 +515,7 @@ object SessionPrefs {
     }
 
     fun setResolutionChoice(context: Context, mode: String, choice: String) {
-        val value = if (choice == SessionDisplay.MATCH_SCREEN) choice else {
+        val value = if (choice == SessionDisplay.MATCH_SCREEN || SessionDisplay.presetHeight(choice) != null) choice else {
             val size = requireNotNull(parseResolution(choice)) { "Invalid resolution" }
             "${size.first}x${size.second}"
         }
@@ -559,6 +531,22 @@ object SessionPrefs {
     fun fexPreset(context: Context): String = prefs(context).getString("fexPreset", DEFAULT_FEX_PRESET) ?: DEFAULT_FEX_PRESET
 
     private const val DEFAULT_FEX_PRESET = "PERFORMANCE_TSO"
+
+    /**
+     * Force SSBS for Proton games: Wine resumes threads from a Windows CONTEXT that never carries
+     * PSTATE.SSBS, so they run with speculative store bypass disabled; libssbs.so keeps it set
+     * (on DiRT 3 / GE-Proton: from ~99% of a game's threads running without it to none). The
+     * speed-up is reported on Oryon cores (Snapdragon 8 Elite) and was not measurable on an
+     * 8 Gen 3, so it is off unless turned on. A game's own environment can still say
+     * DROIDDECK_FORCE_SSBS=0.
+     */
+    fun forceSsbs(context: Context): Boolean = prefs(context).getBoolean("forceSsbs", false)
+
+    fun setForceSsbs(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean("forceSsbs", on).apply()
+        runCatching { GameEnvironmentStore.publish(context) }
+            .onFailure { android.util.Log.e("GameEnvironment", "Could not update game environment", it) }
+    }
 
     fun setFexPreset(context: Context, id: String) {
         prefs(context).edit().putString("fexPreset", id).apply()
@@ -778,11 +766,14 @@ object SessionPrefs {
 
     fun suspendPolicy(context: Context, mode: String): String =
         prefs(context).getString("suspendPolicy.${prefMode(mode)}", SUSPEND_MANUAL)
-            ?.takeIf { it == SUSPEND_AUTO || it == SUSPEND_MANUAL || it == SUSPEND_NEVER }
+            ?.takeIf { it in setOf(SUSPEND_AUTO, SUSPEND_NATIVE, SUSPEND_MANUAL, SUSPEND_NEVER) }
+            // Direct games share Steam's settings but have no Steam client to prepare.
+            ?.let { if (it == SUSPEND_NATIVE && mode != SessionService.MODE_STEAM) SUSPEND_AUTO else it }
             ?: SUSPEND_MANUAL
 
     fun setSuspendPolicy(context: Context, mode: String, policy: String) {
-        val normalized = policy.takeIf { it == SUSPEND_AUTO || it == SUSPEND_MANUAL || it == SUSPEND_NEVER }
+        val normalized = policy.takeIf { it in setOf(SUSPEND_AUTO, SUSPEND_MANUAL, SUSPEND_NEVER) ||
+            (it == SUSPEND_NATIVE && mode == SessionService.MODE_STEAM) }
             ?: SUSPEND_MANUAL
         prefs(context).edit().putString("suspendPolicy.${prefMode(mode)}", normalized).apply()
     }

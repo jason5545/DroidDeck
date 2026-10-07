@@ -263,6 +263,8 @@
     <string name="mode_suspend">Background behavior</string>
     <string name="mode_suspend_hint">When the app is hidden or the screen turns off.</string>
     <string name="mode_suspend_manual">Manual</string>
+    <string name="mode_suspend_native">Native</string>
+    <string name="mode_suspend_steam_note">Auto pauses and resumes when shown. Native prepares Steam for sleep first. Manual waits for Resume. Never keeps running.</string>
     <string name="mode_suspend_note">Auto pauses in the background and resumes when shown. Manual waits for Resume. Never keeps running.</string>
     <string name="mode_startup">Startup</string>
     <string name="mode_steam_startup">Start Steam with DroidDeck</string>
@@ -305,8 +307,29 @@
     <string name="mode_added_launches_in">Launches %1$s · in %2$s</string>
     <string name="mode_added_choose">Choose another file…</string>
     <string name="mode_added_exe_note">Defaults to the .exe named after the folder, or else the largest.</string>
-    <string name="mode_fill">Stretch games to fill the screen</string>
-    <string name="mode_fill_hint">Keeps self-resizing games full screen. Turn off if a game shows up small. Applies next session.</string>
+    <string name="wincomp_title">Windows components</string>
+    <string name="wincomp_pad_hint">LB / RB jump between the sections.</string>
+    <string name="wincomp_card_none">None</string>
+    <string name="wincomp_applies">Windows DLLs Proton does not include, from Bannerlator\'s component list. Turn on the ones this game needs: they go into the game\'s own Windows folder, never its files, and stay whichever Proton it runs on.</string>
+    <string name="wincomp_offline">Could not reach the component list. Components already downloaded can still be switched.</string>
+    <string name="wincomp_recommended">Recommended for this game</string>
+    <string name="wincomp_found_bundled">The game ships %1$s</string>
+    <string name="wincomp_found_shipped">The game has %1$s (often works as is)</string>
+    <string name="wincomp_found_steam">Steam installs %1$s with this game</string>
+    <string name="wincomp_already_here">Already in this game</string>
+    <string name="wincomp_no_recommendation">Nothing in the game\'s folder points at a component.</string>
+    <string name="wincomp_all">All components (%1$d)</string>
+    <string name="wincomp_installers">Need a Windows installer (%1$d)</string>
+    <string name="wincomp_installers_note">These run a real installer inside the prefix (.NET, PhysX, XNA, the full Visual C++ installers…). DroidDeck cannot do that yet; it is coming next.</string>
+    <string name="wincomp_show">Show</string>
+    <string name="wincomp_hide">Hide</string>
+    <string name="wincomp_needs_installer">Needs a Windows installer (coming)</string>
+    <string name="wincomp_unsupported">Not supported here yet</string>
+    <string name="wincomp_loading">Loading the components…</string>
+    <string name="wincomp_failed">Could not install: %1$s</string>
+    <string name="wincomp_downloaded">Downloaded</string>
+    <string name="wincomp_download_size">%1$s download</string>
+    <string name="wincomp_next_launch">Takes effect the next time the game starts.</string>
     <string name="mode_stretch169">Stretch 16:9 games</string>
     <string name="mode_stretch169_hint">On screens squarer than 16:9, stretches games to fill instead of showing bars. Applies next session.</string>
     <string name="mode_audio">Audio</string>
@@ -485,7 +508,6 @@
     <string name="drawer_prev_page">Previous page</string>
     <string name="drawer_next_page">Next page</string>
     <string name="drawer_hud">Performance HUD</string>
-    <string name="drawer_fill">Stretch games to fill</string>
     <string name="drawer_scaling">Scaling mode</string>
     <string name="drawer_scaling_sharpness">Scaling sharpness</string>
     <string name="drawer_effects">Screen effects</string>
@@ -1037,10 +1059,6 @@
     <string name="display_filter_note">FSR, GSR and NIS apply when enlarging the session image. Sharpen only also works without enlargement.</string>
     <string name="display_sharpness">Filter sharpness</string>
     <string name="display_frame_rate">Frame rate</string>
-    <string name="display_window_compatibility">Game window compatibility</string>
-    <string name="display_force_fullscreen">Force game windows fullscreen</string>
-    <string name="display_force_fullscreen_hint">Makes every game window the size of the screen. Turn on if a game comes back small or in a corner after switching apps; leave off if a game flickers between sizes. Applies live during a session.</string>
-    <string name="display_force_fullscreen_live">Turn on if a game comes back small after switching; off if it flickers. Applies live.</string>
     <string name="display_look_filter">%1$s Sets scaling to %2$s.</string>
     <string name="display_match_screen">Match screen (%1$d×%2$d)</string>
     <string name="mode_tab_steam">Steam</string>
@@ -1050,4 +1068,6 @@
     <string name="device_info_copy">Copy</string>
     <string name="device_info_copy_hint">Copy these details into a bug report.</string>
     <string name="device_info_copied">Copied.</string>
+    <string name="force_ssbs_title">Force SSBS</string>
+    <string name="force_ssbs_hint">Keeps a CPU speed setting on that Wine keeps turning off. Can make Windows games faster on Snapdragon 8 Elite; little change seen on older chips. Applies on the next game launch.</string>
 </resources>
