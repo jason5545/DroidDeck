@@ -1,12 +1,12 @@
-package com.droiddeck.launcher.runtime
+package com.droiddeck.launcher.session
 
 import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class AndroidCjkFaceTest {
-    private fun face(tag: String): String? = LinuxRuntime.androidCjkFace(Locale.forLanguageTag(tag))
+class CjkFaceTest {
+    private fun face(tag: String): String? = CjkFace.forLocale(Locale.forLanguageTag(tag))
 
     @Test fun chineseByRegionAndScript() {
         assertEquals("TC", face("zh-TW"))

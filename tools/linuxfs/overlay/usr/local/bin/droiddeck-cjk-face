@@ -1,0 +1,27 @@
+#!/bin/sh
+# Prints the fontconfig rules that give CJK text naming no language - most of Wine's - the Noto
+# Sans CJK face for the app's language, or nothing for a language that has none.
+#
+#   droiddeck-cjk-face <SC|TC|HK|JP|KR>
+#
+# droiddeck-session writes them to /etc/fonts/conf.d/65-droiddeck-cjk.conf. Text that names its
+# language already gets that language's face from 66-droiddeck-device-fonts.conf; untagged Han
+# fell to the Korean face, which 65-nonlatin.conf puts in front of sans-serif for Hangul. The face
+# goes in just before each generic family: this file (65-d...) is read ahead of 65-nonlatin, so
+# it lands ahead of the Korean face and still behind the Latin defaults 60-latin.conf put there.
+# And at the end as well, for a rootfs whose default rules were never linked (droiddeck-desktop
+# links them), where nothing else names a CJK face.
+case ${1:-} in
+  SC|TC|HK|JP|KR) face="Noto Sans CJK $1" ;;
+  *) exit 0 ;;
+esac
+echo '<?xml version="1.0"?>'
+echo '<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">'
+echo '<!-- Written by droiddeck-session at each session start (droiddeck-cjk-face). -->'
+echo '<fontconfig>'
+for generic in sans-serif serif monospace; do
+  printf '  <match target="pattern"><test name="family"><string>%s</string></test><edit name="family" mode="prepend"><string>%s</string></edit></match>\n' \
+    "$generic" "$face"
+done
+printf '  <match target="pattern"><edit name="family" mode="append_last"><string>%s</string></edit></match>\n' "$face"
+echo '</fontconfig>'

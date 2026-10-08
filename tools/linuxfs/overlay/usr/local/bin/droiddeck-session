@@ -136,6 +136,36 @@ program_cores() {
 }
 
 if [ -z "${BL_INSIDE:-}" ]; then
+  device_fonts=/usr/local/share/fonts/android
+  if [ -d "$device_fonts" ] && [ -d /etc/fonts/conf.d ] && command -v fc-cache >/dev/null 2>&1; then
+    fonts_rules=$(
+      echo '<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd"><fontconfig>'
+      for pair in "zh-cn=Noto Sans CJK SC" "zh-sg=Noto Sans CJK SC" "zh-tw=Noto Sans CJK TC" "zh-hk=Noto Sans CJK HK" \
+        "zh-mo=Noto Sans CJK HK" "ja=Noto Sans CJK JP" "ko=Noto Sans CJK KR" "th=Noto Sans Thai"; do
+        printf '<match target="pattern"><test name="lang" compare="contains"><string>%s</string></test><edit name="family" mode="prepend_first"><string>%s</string></edit></match>\n' \
+          "${pair%%=*}" "${pair#*=}"
+      done
+      echo '</fontconfig>'
+    )
+    fonts_conf=/etc/fonts/conf.d/66-droiddeck-device-fonts.conf
+    [ "$fonts_rules" = "$(cat "$fonts_conf" 2>/dev/null)" ] || printf '%s\n' "$fonts_rules" > "$fonts_conf"
+    fonts_seen=$(ls -lL "$device_fonts" 2>/dev/null | md5sum)
+    fonts_stamp=/var/cache/fontconfig/.droiddeck-android-fonts
+    if [ "$fonts_seen" != "$(cat "$fonts_stamp" 2>/dev/null)" ]; then
+      fc-cache -f "${device_fonts%/*}" >/dev/null 2>&1 && printf '%s\n' "$fonts_seen" > "$fonts_stamp"
+      echo "== fontconfig: indexed $(ls "$device_fonts" | wc -l) device fonts, zh falls back to $(fc-match -f '%{family[0]}' ':lang=zh-cn' 2>/dev/null)"
+    fi
+    # CJK text that names no language gets the face for the app's language (BL_CJK_FACE).
+    cjk_conf=/etc/fonts/conf.d/65-droiddeck-cjk.conf
+    cjk_rules=$(droiddeck-cjk-face "${BL_CJK_FACE:-}" 2>/dev/null)
+    if [ -z "$cjk_rules" ]; then
+      rm -f "$cjk_conf"
+    elif [ "$cjk_rules" != "$(cat "$cjk_conf" 2>/dev/null)" ]; then
+      printf '%s\n' "$cjk_rules" > "$cjk_conf"
+    fi
+    # The copy of Noto Sans CJK the app made before the device's fonts were bound.
+    rm -rf /usr/share/fonts/droiddeck-android
+  fi
   # The compositor may still be starting, and a socket left by an earlier session is not
   # a compositor: probe until a connection succeeds.
   for _ in $(seq 1 100); do
@@ -620,7 +650,7 @@ case $mode in
         local d
         [ -e "$compat_stamp" ] && [ "$((beat % 12))" -ne 0 ] || return 0
         for d in "$steam_root/steamapps" "$steam_root/steamapps/common" "$steam_root/config" \
-                 "$steam_root/compatibilitytools.d" /mnt/droiddeck-sd/steamapps; do
+                 "$steam_root/compatibilitytools.d" /mnt/droiddeck-sd/steamapps /root/Games/*/steamapps; do
           [ "$d" -nt "$compat_stamp" ] && return 0
         done
         return 1
@@ -710,11 +740,12 @@ BUSCONF
       exit 69
     fi
 
-    # The font Chinese text gets: the app copies Android's Noto Sans CJK into the rootfs
-    # (LinuxRuntime.syncAndroidCjkFonts). In the background, since the first look builds
-    # fontconfig's cache for it - which the client's web views then find ready.
+    # The font Chinese text gets, tagged zh-TW and tagged with nothing (U+4E2D), from the
+    # device's fonts. In the background, since a first look may build fontconfig's cache - which
+    # the client's web views then find ready.
     command -v fc-match >/dev/null 2>&1 \
-      && ( echo "== fonts: zh-TW text uses $(fc-match ':lang=zh-tw' 2>/dev/null || echo 'no match')" ) &
+      && ( echo "== fonts: zh-TW text uses $(fc-match ':lang=zh-tw' 2>/dev/null || echo 'no match');" \
+        "untagged Han uses $(fc-match 'sans-serif:charset=4e2d' 2>/dev/null || echo 'no match')" ) &
     export STEAM_RUNTIME=1
     export LD_LIBRARY_PATH=$steam_root/steamrtarm64:$steam_root/steamrtarm64/panorama${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
     export SDL_VIDEO_X11_DGAMOUSE=0
@@ -810,6 +841,10 @@ BUSCONF
     # and a restart below (rc=42, or the one after the ARM64 Proton lands) would otherwise start it
     # again on the branch it just wrote.
     steam_channel=${BL_STEAM_CHANNEL:-steamdeck_publicbeta}
+    # The app's language (Setup, or the system's): the client's interface takes -language over its
+    # registry, and the registry is rewritten before each start below for its update window.
+    _bl_lang=()
+    [ -n "${BL_STEAM_LANGUAGE:-}" ] && _bl_lang=(-language "$BL_STEAM_LANGUAGE")
     steam_beta=$steam_root/package/beta
     if [ -n "${BL_ADDED_GAMES:-}" ] && [ -f "$BL_ADDED_GAMES" ]; then
       droiddeck-steam-games watch "$steam_root" "$BL_ADDED_GAMES" &
@@ -833,7 +868,7 @@ BUSCONF
         done
       ) &
     fi
-    echo "== steam args: ${_bl_ui[*]} ${_bl_cdp[*]} -clientbeta $steam_channel -no-cef-sandbox -cef-force-gpu -cef-ozone-platform=x11 -cef-use-gl=angle -cef-use-angle=vulkan $*"
+    echo "== steam args: ${_bl_ui[*]} ${_bl_cdp[*]} ${_bl_lang[*]} -clientbeta $steam_channel -no-cef-sandbox -cef-force-gpu -cef-ozone-platform=x11 -cef-use-gl=angle -cef-use-angle=vulkan $*"
     # An update that cannot install asks for a restart (rc=42) every time; the count is capped so a
     # session can never again loop in silence, which reads as a menu opening and closing by itself.
     steam_updates=0
@@ -882,18 +917,22 @@ BUSCONF
         echo start >> "$steam_root/package/droiddeck-unconfirmed"
         _bl_counted=1
       fi
+      # Between starts only: the client holds registry.vdf in memory and writes it back on exit.
+      if [ -n "${BL_STEAM_LANGUAGE:-}" ]; then
+        droiddeck-steam-language "$HOME" "$BL_STEAM_LANGUAGE" || true
+      fi
       step "starting the Steam client${BL_STEAM_UI:+ ($BL_STEAM_UI UI)}"
-      "$steam_root/steamrtarm64/steam" "${_bl_ui[@]}" "${_bl_cdp[@]}" -clientbeta "$steam_channel" \
+      "$steam_root/steamrtarm64/steam" "${_bl_ui[@]}" "${_bl_cdp[@]}" "${_bl_lang[@]}" -clientbeta "$steam_channel" \
         -no-cef-sandbox -cef-force-gpu -cef-ozone-platform=x11 \
         -cef-use-gl=angle -cef-use-angle=vulkan "$@"
       rc=$?
       echo "== steam exited rc=$rc"
+      if [ -n "${BL_ADDED_GAMES:-}" ] && [ -f "$BL_ADDED_GAMES" ]; then
+        droiddeck-steam-shortcuts "$steam_root" "$BL_ADDED_GAMES" || true
+      fi
       collect_steam_logs
       if [ -f "$HOME/.config/droiddeck/fex-wanted" ] && [ -x /usr/local/bin/droiddeck-fex ]; then
         /usr/local/bin/droiddeck-fex status >/dev/null 2>&1 || true
-      fi
-      if [ -n "${BL_ADDED_GAMES:-}" ] && [ -f "$BL_ADDED_GAMES" ]; then
-        droiddeck-steam-shortcuts "$steam_root" "$BL_ADDED_GAMES" || true
       fi
       if [ -f "$HOME/.bl-stop-requested" ]; then
         rm -f "$HOME/.bl-stop-requested" "$HOME/.bl-restart-once"

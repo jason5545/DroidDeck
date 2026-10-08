@@ -31,7 +31,8 @@ class TraditionalChineseTest(unittest.TestCase):
     """values-zh-rTW is a fork patch (PATCHES.md): it must keep up with the English strings."""
 
     def test_every_entry_translated_with_the_same_placeholders(self):
-        english = entries(RES / "values/strings.xml")
+        english = {name: entry for name, entry in entries(RES / "values/strings.xml").items()
+                   if entry[1].get("translatable") != "false"}
         chinese = entries(RES / "values-zh-rTW/strings.xml")
         self.assertEqual(sorted(set(english) - set(chinese)), [], "English entries without a translation")
         self.assertEqual(sorted(set(chinese) - set(english)), [], "translations of entries English no longer has")
