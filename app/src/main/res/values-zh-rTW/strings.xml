@@ -333,10 +333,10 @@
     <string name="wincomp_active">這個遊戲已安裝（%1$d）</string>
     <string name="wincomp_all">所有元件（%1$d）</string>
     <string name="wincomp_installers">需要 Windows 安裝程式（%1$d）</string>
-    <string name="wincomp_installers_note">這些是各自獨立的安裝程式（編解碼器套件、瀏覽器、舊版執行環境），裡面沒有可以拆開的套件。DroidDeck 目前還不能執行 Windows 安裝程式，下一步就會支援。</string>
+    <string name="wincomp_installers_note">這些是各自獨立的安裝程式，裡面沒有可以拆開的套件，也還沒有它們安裝結果的錄製檔。多數是舊版執行環境，Proton 內建的 Mono 已經能代替；錄製好一個就會加上一個。</string>
     <string name="wincomp_show">顯示</string>
     <string name="wincomp_hide">隱藏</string>
-    <string name="wincomp_needs_installer">要執行自己的安裝程式（即將支援）</string>
+    <string name="wincomp_needs_installer">要執行自己的安裝程式（還沒有錄製檔）</string>
     <string name="wincomp_unsupported">這裡還不支援</string>
     <string name="wincomp_loading">正在載入元件…</string>
     <string name="wincomp_failed">無法安裝：%1$s</string>
@@ -634,6 +634,10 @@
     <string name="setup_home">當成主畫面使用</string>
     <string name="setup_home_on">DroidDeck 可以當主畫面 App</string>
     <string name="setup_home_off">DroidDeck 不會出現在主畫面 App 的選項裡</string>
+    <string name="setup_orientation">螢幕方向</string>
+    <string name="setup_orientation_auto">自動橫向</string>
+    <string name="setup_orientation_landscape">橫向</string>
+    <string name="setup_orientation_reverse">反向橫向</string>
     <string name="setup_fullscreen">全螢幕</string>
     <string name="setup_fullscreen_on">隱藏 Android 的狀態列和導覽列</string>
     <string name="setup_fullscreen_off">顯示 Android 的狀態列和導覽列</string>
@@ -845,6 +849,8 @@
     <string name="ctrl_steam_button">Steam 按鈕</string>
     <string name="ctrl_qam_button">快速存取按鈕</string>
     <string name="ctrl_keyboard_button">鍵盤按鈕</string>
+    <string name="ctrl_select_steam">按 Select 開啟 Steam 選單</string>
+    <string name="ctrl_select_steam_hint">取代原本的 View/Select。</string>
     <string name="setup_animations">動畫</string>
     <string name="ctrl_adaptive_hint">搖桿出現在手指按下的位置，放開就隱藏</string>
     <string name="ctrl_layout">版面配置</string>
@@ -892,6 +898,12 @@
     <string name="content_page_gone">這個頁面不見了，請從左邊選一個區塊。</string>
     <string name="content_open_desktop">開啟桌面</string>
     <string name="content_install_open_desktop">安裝並開啟桌面</string>
+    <string name="desktop_remove_title">解除安裝桌面</string>
+    <string name="desktop_remove_text">移除桌面和隨附的 App。遊戲、自行加入的 App、設定和共用程式庫都會保留。</string>
+    <string name="desktop_removing">正在移除桌面</string>
+    <string name="desktop_removed">桌面已移除</string>
+    <string name="desktop_cleaning_legacy">正在移除舊的 LXQt 檔案</string>
+    <string name="desktop_removal_unknown">請先更新 DroidDeck，再移除這個版本的桌面。</string>
     <string name="content_linux_desktop">Linux 桌面</string>
     <string name="content_linux_desktop_hint">KDE Plasma、Firefox 和你的模擬器</string>
     <string name="games_empty">你在 Steam 安裝的遊戲，會在工作階段結束後顯示在這裡。</string>
@@ -963,6 +975,12 @@
     <string name="deck_tab_left">左觸控板</string>
     <string name="deck_tab_right">右觸控板</string>
     <string name="deck_tab_both">兩側</string>
+    <string name="deck_tab_gamepad">控制器</string>
+    <string name="deck_surface_stick">搖桿</string>
+    <string name="deck_surface_trackpad">觸控板</string>
+    <string name="deck_surface_switch">在搖桿和觸控板之間切換</string>
+    <string name="deck_more_controls">更多 Deck 控制項</string>
+    <string name="deck_panels">面板</string>
     <string name="deck_close">關閉第二螢幕控制項</string>
     <string name="deck_open_steam_menu">開啟 Steam 選單</string>
     <string name="deck_left_upper">左 · 上</string>
@@ -1026,6 +1044,8 @@
     <string name="game_env_eyebrow">Proton 遊戲</string>
     <string name="pip_title">子母畫面</string>
     <string name="pip_auto">自動進入子母畫面</string>
+    <string name="unfolded_controls">展開螢幕上的控制項</string>
+    <string name="unfolded_controls_hint">展開時，遊戲畫面在 Steam Deck 觸控板和背鍵上方；摺疊時，遊戲全螢幕顯示。</string>
     <string name="pip_suspended">已暫停</string>
     <string name="pip_not_ready">工作階段準備好後才能使用子母畫面。</string>
     <string name="pip_permission">請在 Android 設定裡允許 DroidDeck 使用子母畫面。</string>
@@ -1412,6 +1432,7 @@
     <string name="ctrl_target_right">方向鍵右</string>
     <string name="ctrl_target_hidden">隱藏</string>
     <string name="ctrl_editor_drag">拖曳以移動</string>
+    <string name="ctrl_editor_snap">對齊</string>
     <string name="ctrl_editor_save">儲存</string>
     <string name="second_mode_none">無</string>
     <string name="second_mode_keyboard_trackpad">鍵盤 + 觸控板</string>

@@ -10,6 +10,7 @@ import java.io.File
 import android.content.pm.PackageManager
 import android.hardware.display.DisplayManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,6 +18,7 @@ import android.util.Log
 import android.view.Display
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -139,6 +141,7 @@ class MainActivity : ComponentActivity() {
     private var pkgStage by mutableStateOf<String?>(null)
     private var pkgPercent by mutableIntStateOf(-1)
     private var desktopInstalled by mutableStateOf(false)
+    private var desktopPresent by mutableStateOf(false)
     private var offlineAccount by mutableStateOf<String?>(null)
     private var offline by mutableStateOf(false)
     private var showPerformance by mutableStateOf(false)
@@ -161,6 +164,7 @@ class MainActivity : ComponentActivity() {
     private var showPhantomGate by mutableStateOf(false)
     private var directAudio by mutableStateOf(false)
     private var stretch16x9 by mutableStateOf(false)
+    private var orientation by mutableStateOf(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
     private var launcherFullscreen by mutableStateOf(true)
     private var animationsEnabled by mutableStateOf(true)
     private var storeEnabled by mutableStateOf(false)
@@ -531,6 +535,8 @@ class MainActivity : ComponentActivity() {
         // Last start's game list, so the Steam wall is up on the first frame; refresh() replaces it.
         steamGames = if (shortcutPicker) emptyList() else com.droiddeck.launcher.frontend.LibraryCache.load(this)
         backActionsInverted = SessionPrefs.backActionsInverted(this)
+        orientation = SessionPrefs.orientation(this)
+        requestedOrientation = orientation
         launcherFullscreen = SessionPrefs.launcherFullscreen(this)
         animationsEnabled = SessionPrefs.animationsEnabled(this)
         storeEnabled = SessionPrefs.storeEnabled(this)
@@ -560,7 +566,7 @@ class MainActivity : ComponentActivity() {
                         shortcutLibraryScanning = shortcutLibraryScanning,
                         gameSyncFolder = gameSyncFolder,
                         busy = busy, stage = stage, percent = percent,
-                        desktopInstalled = desktopInstalled,
+                        desktopInstalled = desktopInstalled, desktopPresent = desktopPresent,
                         offlineAccount = offlineAccount, offline = offline,
                         frameGenLabel = frameGenLabel, romsDir = romsDir, logsEnabled = logsEnabled, agentCommands = agentCommands,
                         steamGames = steamGames, emulators = emulatorList, running = runningLabel,
@@ -588,6 +594,7 @@ class MainActivity : ComponentActivity() {
                         updates = updates.state(),
                         phantomProcessStatus = phantomProcessStatus,
                         showPhantomGate = showPhantomGate,
+                        orientation = orientation,
                         launcherFullscreen = launcherFullscreen,
                         animationsEnabled = animationsEnabled,
                         storeEnabled = storeEnabled,
@@ -669,6 +676,7 @@ class MainActivity : ComponentActivity() {
                         // The activity re-attaches to the session that is running; nothing restarts.
                         onResume = { startActivity(Intent(this, SessionActivity::class.java)) },
                         onSteamSettings = { openModeSettings(SessionService.MODE_STEAM) },
+                        onRemoveDesktop = { removeDesktop() },
                         onDesktopSettings = { openModeSettings(SessionService.MODE_DESKTOP) },
                         onInstallPackage = { id -> installPackage(id) },
                         onRemovePackage = { id -> removePackage(id) },
@@ -732,6 +740,11 @@ class MainActivity : ComponentActivity() {
                         onAppScale = { percent ->
                             com.droiddeck.launcher.core.AppUiPrefs.setScale(this, percent)
                             appScale = com.droiddeck.launcher.core.AppUiPrefs.scale(this)
+                        },
+                        onOrientation = { value ->
+                            SessionPrefs.setOrientation(this, value)
+                            orientation = value
+                            requestedOrientation = value
                         },
                         onLauncherFullscreen = { on ->
                             SessionPrefs.setLauncherFullscreen(this, on)
@@ -822,6 +835,7 @@ class MainActivity : ComponentActivity() {
                             onSteamButton = { on -> ControllerPrefs.setSteamButton(this, on); refreshController() },
                             onQamButton = { on -> ControllerPrefs.setQamButton(this, on); refreshController() },
                             onKeyboardButton = { on -> ControllerPrefs.setKeyboardButton(this, on); refreshController() },
+                            onSelectSteam = { on -> ControllerPrefs.setSelectSteam(this, on); refreshController() },
                             onEditLayout = { startActivity(Intent(this, ControllerEditorActivity::class.java)) },
                             onResetLayout = { ControllerPrefs.resetAllLayouts(this); refreshController() },
                             onMapping = { settingsMode = null; showPerformance = false; showProtons = false; showComponents = false; showMapping = true },
@@ -891,6 +905,7 @@ class MainActivity : ComponentActivity() {
         // A session folder left without its ending - the process was killed - gets it now.
         if (!SessionState.running) Thread({
             com.droiddeck.launcher.session.LogMigration.run(this)
+            com.droiddeck.launcher.frontend.GamesFolderMigration.run(this)
             SessionLogShare.clear(this)
             SessionArtifacts.finishAbandoned(this)
             SessionArtifacts.scrubOlder(this)
@@ -932,6 +947,15 @@ class MainActivity : ComponentActivity() {
         } else {
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         }
+        if (Build.VERSION.SDK_INT >= 28) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode = if (launcherFullscreen) {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                } else {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                }
+            }
+        }
     }
 
     /** On the Components page the pad's LB / RB step through GPU drivers, FEX, DXVK and VKD3D-Proton, wrapping around. */
@@ -958,6 +982,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        orientation = SessionPrefs.orientation(this)
+        requestedOrientation = orientation
         refreshWifiDiscovery()
         // Back from a store's sign-in page: the Stores chips show the account at once. A store
         // install finishing while this screen is up rebuilds the Games list through the listener.
@@ -1198,6 +1224,7 @@ class MainActivity : ComponentActivity() {
     private fun refreshPackages() {
         packageRows = catalog?.map { PackageRow(it.id, it.kind, it.notes) }
         desktopInstalled = DesktopCatalog.desktopInstalled(this)
+        desktopPresent = DesktopCatalog.desktopPresent(this)
     }
 
     private fun launchProgram(path: String) {
@@ -1251,6 +1278,8 @@ class MainActivity : ComponentActivity() {
                 steamDownloadsInBackground = steamDownloadsInBackground,
                 pipSupported = com.droiddeck.launcher.session.SessionPipController.supported(this),
                 pipAutoEnter = pipAutoEnter,
+                unfoldedControls = if (mode == SessionService.MODE_STEAM &&
+                    com.droiddeck.launcher.session.SessionDisplay.foldable(this)) unfoldedControls else null,
                 oscMode = if (mode == SessionService.MODE_STEAM) oscMode else null,
                 backActionsInverted = backActionsInverted,
                 directAudio = if (mode == SessionService.MODE_STEAM) directAudio else null,
@@ -1308,6 +1337,7 @@ class MainActivity : ComponentActivity() {
                     steamDownloadsInBackground = enabled
                 },
                 onPipAutoEnter = { on -> SessionPrefs.setPipAutoEnter(this, on); pipAutoEnter = on },
+                onUnfoldedControls = { on -> SessionPrefs.setUnfoldedControls(this, on); unfoldedControls = on },
                 onOsc = { o -> SessionPrefs.setOscMode(this, o); oscMode = o },
                 onBackActionsInverted = { inverted ->
                     SessionPrefs.setBackActionsInverted(this, inverted)
@@ -1462,9 +1492,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private var pipAutoEnter by mutableStateOf(false)
+    private var unfoldedControls by mutableStateOf(false)
 
     private fun openModeSettings(mode: String) {
         pipAutoEnter = SessionPrefs.pipAutoEnter(this)
+        unfoldedControls = SessionPrefs.unfoldedControls(this)
         showPerformance = false
         showProtons = false
         showComponents = false
@@ -1556,6 +1588,7 @@ class MainActivity : ComponentActivity() {
         if (!busy && LinuxRuntimeInstaller.isBusy()) followRuntimeOperation { LinuxRuntimeInstaller.attach(it) }
         addedGamesArt = SessionPrefs.addedGamesArt(this)
         desktopInstalled = DesktopCatalog.desktopInstalled(this)
+        desktopPresent = DesktopCatalog.desktopPresent(this)
         offlineAccount = OfflineMode.account(this)
         offline = OfflineMode.enabled(this)
         installed = LinuxRuntimeInstaller.installedVersion(this)
@@ -1668,6 +1701,15 @@ class MainActivity : ComponentActivity() {
             protons.protonBusyId != null || ProtonExtras.installInProgress || pkgStage != null ||
             components.compBusy != null || saveBusy != null || com.droiddeck.launcher.store.UserAppsState.working != null
 
+    private fun removeDesktop() {
+        if (runtimeChangesBlocked()) return
+        val operation = LinuxRuntimeInstaller.beginMaintenance(this, getString(R.string.desktop_removing)) ?: return
+        com.droiddeck.launcher.runtime.RuntimeInstallService.keepRemovalAlive(this)
+        followRuntimeOperation { listener ->
+            operation.run(listener) { progress -> DesktopCatalog.removeDesktop(this, progress) }
+        }
+    }
+
     private fun removeRuntime() {
         if (runtimeChangesBlocked()) return
         val removal = LinuxRuntimeInstaller.beginUninstall(this) ?: return
@@ -1690,7 +1732,7 @@ class MainActivity : ComponentActivity() {
     private fun followRuntimeOperation(run: (LinuxRuntimeInstaller.ProgressListener) -> Boolean?) {
         busy = true
         failed = false
-        stage = getString(if (LinuxRuntimeInstaller.isRemoving()) R.string.main_removing_runtime else R.string.store_starting)
+        stage = getString(if (LinuxRuntimeInstaller.isMaintaining()) R.string.desktop_removing else if (LinuxRuntimeInstaller.isRemoving()) R.string.main_removing_runtime else R.string.store_starting)
         percent = -1
         Thread({
             val ok = run(LinuxRuntimeInstaller.ProgressListener { s, p ->

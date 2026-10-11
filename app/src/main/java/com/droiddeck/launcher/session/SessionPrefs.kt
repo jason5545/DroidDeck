@@ -1,6 +1,7 @@
 package com.droiddeck.launcher.session
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import androidx.annotation.StringRes
 import com.droiddeck.launcher.R
 import com.droiddeck.launcher.core.TextureFiltering
@@ -34,6 +35,22 @@ object SessionPrefs {
         if (inverted) BACK_QAM_THEN_MENU else BACK_MENU_THEN_QAM
 
     private fun prefs(context: Context) = context.getSharedPreferences("session", Context.MODE_PRIVATE)
+
+    val orientationOptions = listOf(
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE to R.string.setup_orientation_auto,
+        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE to R.string.setup_orientation_landscape,
+        ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE to R.string.setup_orientation_reverse,
+    )
+
+    fun orientation(context: Context): Int =
+        prefs(context).getInt("orientation", ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
+            .takeIf { value -> orientationOptions.any { it.first == value } }
+            ?: ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+
+    fun setOrientation(context: Context, orientation: Int) {
+        require(orientationOptions.any { it.first == orientation })
+        prefs(context).edit().putInt("orientation", orientation).apply()
+    }
 
     /** Whether the launcher hides Android's status and navigation bars. */
     fun launcherFullscreen(context: Context): Boolean = prefs(context).getBoolean("launcherFullscreen", true)
@@ -631,8 +648,9 @@ object SessionPrefs {
     }
 
     /**
-     * The folders of the user's own Windows games (one game per subfolder), any number of them
-     * from anywhere on the device. The single folder an earlier build kept is carried in.
+     * The Games folders earlier builds let the user add (one game per subfolder); read only by
+     * GamesFolderMigration, which turns them into entries and clears them. The single folder an
+     * even earlier build kept is carried in.
      */
     fun addedGamesDirs(context: Context): List<String> {
         val p = prefs(context)
@@ -644,6 +662,26 @@ object SessionPrefs {
 
     fun setAddedGamesDirs(context: Context, dirs: List<String>) {
         prefs(context).edit().putString("addedGamesDirs", dirs.distinct().joinToString("\n")).remove("addedGamesDir").apply()
+    }
+
+    /**
+     * The Games folders earlier builds had (host path, guest path), still bound into the session so
+     * their games keep their paths; written once by GamesFolderMigration.
+     */
+    fun gameFolderBinds(context: Context): List<Pair<String, String>> =
+        (prefs(context).getString("gameFolderBinds", "") ?: "").split('\n').mapNotNull { line ->
+            line.split('\t').takeIf { it.size == 2 && it[0].isNotEmpty() && it[1].isNotEmpty() }?.let { it[0] to it[1] }
+        }
+
+    fun setGameFolderBinds(context: Context, binds: List<Pair<String, String>>) {
+        prefs(context).edit().putString("gameFolderBinds", binds.distinctBy { it.first }.joinToString("\n") { "${it.first}\t${it.second}" }).apply()
+    }
+
+    /** The Games folders were turned into entries (GamesFolderMigration); a record, not a gate. */
+    fun gamesFoldersMigrated(context: Context): Boolean = prefs(context).getBoolean("gamesFoldersMigrated", false)
+
+    fun setGamesFoldersMigrated(context: Context) {
+        prefs(context).edit().putBoolean("gamesFoldersMigrated", true).apply()
     }
 
     /**
@@ -900,6 +938,26 @@ object SessionPrefs {
 
     fun setPipAutoEnter(context: Context, enabled: Boolean) {
         prefs(context).edit().putBoolean("pipAutoEnter", enabled).apply()
+    }
+
+    /** A foldable's unfolded panel shows the game above the Deck controls (SessionDisplay.unfoldedGameHeight). */
+    fun unfoldedControls(context: Context): Boolean = prefs(context).getBoolean("unfoldedControls", false)
+
+    fun setUnfoldedControls(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean("unfoldedControls", enabled).apply()
+    }
+
+    const val SURFACE_STICK = "stick"
+    const val SURFACE_TRACKPAD = "trackpad"
+
+    /** The Deck controls' gamepad tab: what each side is - an analog stick or a Steam trackpad.
+     *  Left a stick and right a trackpad until changed, as a Deck is mostly played. */
+    fun gamepadSurface(context: Context, right: Boolean): String =
+        prefs(context).getString(if (right) "gamepadRight" else "gamepadLeft", null)
+            ?: if (right) SURFACE_TRACKPAD else SURFACE_STICK
+
+    fun setGamepadSurface(context: Context, right: Boolean, surface: String) {
+        prefs(context).edit().putString(if (right) "gamepadRight" else "gamepadLeft", surface).apply()
     }
 
     fun suspendPolicy(context: Context, mode: String): String =

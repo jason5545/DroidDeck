@@ -29,6 +29,7 @@ import com.droiddeck.launcher.audio.PulseAudioComponent
 import com.droiddeck.launcher.core.CpuCores
 import com.droiddeck.launcher.core.DeviceReport
 import com.droiddeck.launcher.core.HostEnvironment
+import com.droiddeck.launcher.core.DeviceSupport
 import com.droiddeck.launcher.core.SessionLogCapture
 import com.droiddeck.launcher.core.NetworkReport
 import com.droiddeck.launcher.core.SessionPart
@@ -36,9 +37,12 @@ import com.droiddeck.launcher.core.FileUtils
 import com.droiddeck.launcher.core.HostProcess
 import com.droiddeck.launcher.frontend.GameLaunchLink
 import com.droiddeck.launcher.input.FakeInputWriter
+import com.droiddeck.launcher.input.SteamControllerBle
+import com.droiddeck.launcher.runtime.BwrapSpawner
 import com.droiddeck.launcher.runtime.LinuxNetworkLinkComponent
 import com.droiddeck.launcher.runtime.LinuxRuntime
 import com.droiddeck.launcher.runtime.ProotFastPath
+import com.droiddeck.launcher.runtime.UserApps
 import com.droiddeck.launcher.wayland.WaylandCompositor
 import java.io.File
 import java.text.SimpleDateFormat
@@ -204,6 +208,10 @@ class SessionService : Service() {
                 resumeSession()
                 return START_NOT_STICKY
             }
+        }
+        if (com.droiddeck.launcher.runtime.LinuxRuntimeInstaller.isMaintaining()) {
+            stopSelf(startId)
+            return START_NOT_STICKY
         }
         startForeground(NOTIFICATION_ID, buildNotification())
         if (SessionState.running) return START_NOT_STICKY
@@ -679,7 +687,9 @@ class SessionService : Service() {
         // changes what games do and leaves the client alone. The microphone is its own opt-in on
         // top, and the helper only opens an input stream when asked - so a user who wants game
         // sound but no recording gets exactly that, and Android's recording indicator stays off.
-        val wantsDirectAudio = SessionState.mode == MODE_STEAM && SessionPrefs.directAudio(this)
+        // The desktop starts Windows programs through the same Proton wrappers (droiddeck-proton-run).
+        val wantsDirectAudio = (SessionState.mode == MODE_STEAM || SessionState.mode == MODE_DESKTOP) &&
+            SessionPrefs.directAudio(this)
         val wantsMic = SessionPrefs.micEnabled(this) &&
             checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
         // Both paths sit under the app's files directory, which the session binds at its own path,
@@ -743,7 +753,10 @@ class SessionService : Service() {
             !File(Environment.getExternalStorageDirectory(), NO_DECK_PAD_SWITCH).exists()
         // Steam's touch controller rides on the Deck's sysfs and is offered only beside it.
         val wantsTouch = wantsDeck && !File(Environment.getExternalStorageDirectory(), NO_STEAM_TOUCH_SWITCH).exists()
-        deckBinds = if (wantsDeck) SteamDeckPad.prepare(this, fakeInputDir.parentFile!!.parentFile!!, wantsTouch) else emptyList()
+        // A paired Triton is exposed as a second native Steam Controller HID, with its original
+        // report IDs and output path. The handheld's own pad remains the Deck target.
+        val wantsTriton = wantsDeck && SteamControllerBle.hasPairedController(this)
+        deckBinds = if (wantsDeck) SteamDeckPad.prepare(this, fakeInputDir.parentFile!!.parentFile!!, wantsTouch, wantsTriton) else emptyList()
         SessionState.deckPad = deckBinds.isNotEmpty()
         if (wantsDeck && !SessionState.deckPad) Log.w(TAG, "deck pad: not available this session; the pad stays an Xbox 360 controller")
         logControllersAtStart()
@@ -753,6 +766,7 @@ class SessionService : Service() {
             guest.add("FAKE_EVDEV_UINPUT=1")
             if (SessionState.deckPad) {
                 guest.add("FAKE_EVDEV_DECK=1")
+                if (wantsTriton) guest.add("FAKE_EVDEV_TRITON=1")
                 // Steam's touch controller (SteamTouchDevice): the file the app and libfakeinput share.
                 if (wantsTouch) com.droiddeck.launcher.input.SteamTouchDevice.prepare(fakeInputDir)?.let {
                     guest.add("FAKE_TOUCHCTL_RING=" + it.path)
@@ -1213,6 +1227,13 @@ class SessionService : Service() {
                     }
                     return
                 }
+                if (path != null && path.startsWith("desktop-import-") && path.endsWith(".request")) {
+                    val request = File(dir, path)
+                    val text = runCatching { request.readText() }.getOrNull() ?: return
+                    request.delete()
+                    importForDesktop(dir, text)
+                    return
+                }
                 if (path != "steam-launch") return
                 val file = File(dir, path)
                 val text = try { file.readText() } catch (e: Exception) { return }
@@ -1240,6 +1261,48 @@ class SessionService : Service() {
         }
         watcher.startWatching()
         launchWatcher = watcher
+    }
+
+    private val desktopImports = java.util.concurrent.ConcurrentHashMap<String, Any>()
+
+    /**
+     * What the desktop cannot run where it lies (droiddeck-open), added as Add an app adds it, menu entry
+     * included: an AppImage of sharun's, whose hard links Android denies apps and only the app's own proot
+     * (link2symlink) makes, or a script or program whose folder of Linux programs is on noexec shared
+     * storage, copied in. The answer goes beside the request, "ok <folder>" or "error <why>".
+     */
+    private fun importForDesktop(dir: File, text: String) {
+        val fields = text.lineSequence().mapNotNull { line ->
+            line.split('=', limit = 2).takeIf { it.size == 2 }?.let { it[0] to it[1].trim() }
+        }.toMap()
+        val key = fields["id"]?.takeIf { it.matches(Regex("[0-9a-f]{16}")) } ?: return
+        val guestPath = fields["path"]?.takeIf { it.startsWith("/") && !it.contains("/../") } ?: return
+        val folder = fields["kind"] == "folder"
+        val binds = LinuxRuntime.lastBinds(this).map { BwrapSpawner.Bind.parse(it) }
+        val file = File(BwrapSpawner.hostPath(binds, LinuxRuntime.rootDir(this).path, guestPath))
+        val context = applicationContext
+        // A request for what is already being added waits for that, then finds it.
+        val lock = desktopImports.computeIfAbsent(key) { Any() }
+        Thread({
+            fun imported() = UserApps.desktopImport(context, key, guestPath)?.let { "ok $it" }
+            val request = UserApps.Request(
+                if (folder) UserApps.Source.Script(file) else UserApps.Source.AppImage(file),
+                if (folder) file.parentFile?.name else null, null, mapOf(UserApps.DESKTOP_IMPORT to "$key\n$guestPath"),
+            )
+            val answer = synchronized(lock) {
+                try {
+                    imported() ?: UserApps.add(context, request) { _, _ -> }?.let { "error $it" }
+                        ?: imported() ?: "error " + context.getString(R.string.user_apps_failed)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Desktop import of $guestPath", e)
+                    "error " + (e.message ?: context.getString(R.string.user_apps_failed))
+                }
+            }
+            Log.i(TAG, "Desktop import of $guestPath: $answer")
+            val result = File(dir, "desktop-import-$key.result")
+            val partial = File(dir, result.name + ".tmp")
+            runCatching { partial.writeText(answer.replace('\n', ' ') + "\n"); partial.renameTo(result) }
+        }, "desktop-import").start()
     }
 
     @Volatile private var syncWatcher: android.os.FileObserver? = null
@@ -1575,8 +1638,10 @@ class SessionService : Service() {
         }
         try {
             val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+            val allowed = DeviceSupport.lowLatencyWifiSafe()
+            if (!allowed) Log.i(TAG, "wifi lock skipped: its low-latency mode resets this device")
             @Suppress("DEPRECATION") // deprecated from API 29, still honoured; targetSdk is 28
-            if (wifiLock?.isHeld != true) {
+            if (allowed && wifiLock?.isHeld != true) {
                 wifiLock = wifi?.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "DroidDeck:session-wifi")
                     ?.apply {
                         setReferenceCounted(false)

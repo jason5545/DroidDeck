@@ -831,6 +831,8 @@
     <string name="ctrl_steam_button">Steam 按钮</string>
     <string name="ctrl_qam_button">QAM 按钮</string>
     <string name="ctrl_keyboard_button">键盘按钮</string>
+    <string name="ctrl_select_steam">按 Select 打开 Steam 菜单</string>
+    <string name="ctrl_select_steam_hint">代替 View/Select。</string>
     <string name="setup_animations">动画</string>
     <string name="ctrl_adaptive_hint">摇杆出现在触摸处，松手后隐藏</string>
     <string name="ctrl_layout">布局</string>
@@ -1556,6 +1558,7 @@
     <!-- The on-screen button is not shown -->
     <string name="ctrl_target_hidden">隐藏</string>
     <string name="ctrl_editor_drag">拖动以移动</string>
+    <string name="ctrl_editor_snap">对齐</string>
     <string name="ctrl_editor_save">保存</string>
 
     <!-- What the second screen shows during a session -->
