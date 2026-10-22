@@ -21,12 +21,14 @@ object SessionPrefs {
     const val SUSPEND_NEVER = "never"
     private const val LEGACY_SUSPEND_DOWNLOADS = "downloads"
     private const val STEAM_DOWNLOADS_IN_BACKGROUND = "steamDownloadsInBackground"
+    private const val DECKY_ZIP_WARNING_SEEN = "deckyZipWarningSeen"
 
     const val CONTROLLER_DECK = "deck"
     const val CONTROLLER_XBOX360 = "xbox360"
     const val CONTROLLER_STEAM = "steamcontroller"
     const val CONTROLLER_DS4 = "dualshock4"
     const val CONTROLLER_DUALSENSE = "dualsense"
+    const val CONTROLLER_NONE = "none"
     const val OSC_AUTO = "auto"
     const val OSC_ALWAYS = "always"
     const val OSC_STEAM_QAM = "steam-qam"
@@ -155,6 +157,43 @@ object SessionPrefs {
     fun setHudEnabled(context: Context, on: Boolean) {
         prefs(context).edit().putBoolean(hudKey(context), on).apply()
     }
+
+    fun hudShowFps(context: Context): Boolean = prefs(context).getBoolean("hudFps", true)
+
+    fun setHudShowFps(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean("hudFps", on).apply()
+    }
+
+    fun hudShowBattery(context: Context): Boolean = prefs(context).getBoolean("hudBattery", true)
+
+    fun setHudShowBattery(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean("hudBattery", on).apply()
+    }
+
+    fun hudShowGraph(context: Context): Boolean = prefs(context).getBoolean("hudGraph", true)
+
+    fun setHudShowGraph(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean("hudGraph", on).apply()
+    }
+
+    fun hudColor(context: Context): String =
+        prefs(context).getString("hudColor", HUD_COLOR_MINT)?.takeIf { it in HUD_COLORS } ?: HUD_COLOR_MINT
+
+    fun setHudColor(context: Context, color: String) {
+        if (color in HUD_COLORS) prefs(context).edit().putString("hudColor", color).apply()
+    }
+
+    fun hudOpacity(context: Context): Int =
+        prefs(context).getInt("hudOpacity", HUD_OPACITY_DEFAULT).takeIf { it in HUD_OPACITY_RANGE } ?: HUD_OPACITY_DEFAULT
+
+    fun setHudOpacity(context: Context, percent: Int) {
+        prefs(context).edit().putInt("hudOpacity", percent.coerceIn(HUD_OPACITY_RANGE)).apply()
+    }
+
+    const val HUD_COLOR_MINT = "mint"
+    val HUD_COLORS = listOf(HUD_COLOR_MINT, "white", "sky", "amber", "violet")
+    val HUD_OPACITY_RANGE = 30..100
+    const val HUD_OPACITY_DEFAULT = 70
 
     private fun hudKey(context: Context) = if (mangoappSession(context)) "hudDeck" else "hud"
 
@@ -439,6 +478,8 @@ object SessionPrefs {
     fun steamController(context: Context): String =
         prefs(context).getString("steamController", CONTROLLER_DECK) ?: CONTROLLER_DECK
     fun setSteamController(context: Context, id: String) { prefs(context).edit().putString("steamController", id).apply() }
+
+    fun builtinPad(context: Context): Boolean = steamController(context) != CONTROLLER_NONE
     fun padType(id: String): Int = when (id) {
         CONTROLLER_STEAM -> com.droiddeck.launcher.input.FakeInputWriter.PAD_TYPE_STEAM
         CONTROLLER_XBOX360 -> com.droiddeck.launcher.input.FakeInputWriter.PAD_TYPE_XBOX
@@ -970,6 +1011,12 @@ object SessionPrefs {
             }
             putString(key, normalized)
         }.apply()
+    }
+
+    fun deckyZipWarningSeen(context: Context): Boolean = prefs(context).getBoolean(DECKY_ZIP_WARNING_SEEN, false)
+
+    fun setDeckyZipWarningSeen(context: Context) {
+        prefs(context).edit().putBoolean(DECKY_ZIP_WARNING_SEEN, true).apply()
     }
 
     fun steamDownloadsInBackground(context: Context): Boolean {

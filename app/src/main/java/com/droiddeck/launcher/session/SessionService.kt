@@ -71,6 +71,7 @@ class SessionService : Service() {
     private val steamDownloadMonitor = SteamDownloadMonitor()
     private var downloadMonitorTask: Runnable? = null
     private var downloadActive = false
+    @Volatile private var steamLibraryMounts = emptyMap<String, File>()
     private var suspendDownloadNow = false
     private var suspendPolicy = SessionPrefs.SUSPEND_MANUAL
     private var steamDownloadsInBackground = false
@@ -394,6 +395,12 @@ class SessionService : Service() {
         val fastPathAt = guest.size
 
         val pulse = startAudio(guest, sessionDir)
+        if (steamHere) {
+            val encoder = VideoEncodeBridge(File(filesDir, "venc/venc.sock"))
+            encoder.attach(this)
+            components.add(encoder)
+            guest.add("BL_VENC_SOCKET=" + encoder.socket.absolutePath)
+        }
 
         guest.add("BL_WIDTH=" + size.first)
         guest.add("BL_HEIGHT=" + size.second)
@@ -706,17 +713,21 @@ class SessionService : Service() {
 
     private fun addControllerEnvironment(guest: MutableList<String>, fakeInputDir: File, sessionDir: File) {
         FakeInputWriter.prepareRingSlots(fakeInputDir, 4)
+        val builtinPad = SessionPrefs.builtinPad(this)
+        val hiddenPad = SessionState.mode == MODE_STEAM && !builtinPad
         fakeInputDir.listFiles()?.forEach { file ->
             val node = Regex("event(\\d+)").matchEntire(file.name)?.groupValues?.get(1)?.toIntOrNull()
-            if (file.name.startsWith(".uinput-") || (node != null && node >= FIRST_VIRTUAL_PAD)) file.delete()
+            if (file.name.startsWith(".uinput-") || (node != null && node >= FIRST_VIRTUAL_PAD) ||
+                (hiddenPad && node == 0)) file.delete()
         }
         guest.add("FAKE_EVDEV_DIR=" + fakeInputDir.path)
         val rings = FakeInputWriter.getRingEnv(fakeInputDir)
-        if (!rings.isNullOrEmpty()) guest.add("FAKE_EVDEV_MEMFD_PATHS=$rings")
+        val presented = if (hiddenPad) rings?.split(';')?.filterNot { it.startsWith("0=") }?.joinToString(";") else rings
+        if (!presented.isNullOrEmpty()) guest.add("FAKE_EVDEV_MEMFD_PATHS=$presented")
         guest.add("FAKE_EVDEV_IDENTITY=xbox360")
         guest.add("FAKE_EVDEV_VIBRATION=1")
         val uinput = !File(Environment.getExternalStorageDirectory(), NO_UINPUT_SWITCH).exists()
-        val wantsDeck = uinput && SessionState.mode == MODE_STEAM &&
+        val wantsDeck = uinput && builtinPad && SessionState.mode == MODE_STEAM &&
             SessionState.steamUi != "desktop" &&
             !File(Environment.getExternalStorageDirectory(), NO_DECK_PAD_SWITCH).exists()
         val wantsTouch = wantsDeck && !File(Environment.getExternalStorageDirectory(), NO_STEAM_TOUCH_SWITCH).exists()
@@ -806,6 +817,7 @@ class SessionService : Service() {
         File(home, "Storage").mkdirs()
         binds.add(Environment.getExternalStorageDirectory().path + ":/root/Storage")
         val library = GameStorage.effective(this)
+        steamLibraryMounts = emptyMap()
         var storageDiagnosticLibrary: File? = null
         if (library != null) {
             val problem = GameStorage.prepare(this, library.path)
@@ -817,6 +829,7 @@ class SessionService : Service() {
                     val content = SecondaryLibrary.contentPath(configured)
                     binds.addAll(SecondaryLibrary.binds(filesDir, configured, content = content))
                     storageDiagnosticLibrary = content
+                    steamLibraryMounts = SecondaryLibrary.CARD_GUESTS.associateWith { content }
                     val route = if (content === configured) "configured" else "verified-native"
                     Log.i(TAG, "game storage: ${content.path} ($route) -> /mnt/droiddeck-sd (\"${library.label}\"); prefixes and native tools private")
                 } catch (e: Exception) {
@@ -1275,13 +1288,13 @@ class SessionService : Service() {
 
     private fun updateSuspendPolicy() {
         if (!SessionState.running) return
-        if (suspendPolicy == SessionPrefs.SUSPEND_MANUAL && !hasVisibleSurface) {
-            manualPauseRequested = true
-        }
-        val controller = suspendController ?: return
         val hidden = !hasVisibleSurface
         val downloadsBlockingSuspend = steamDownloadsInBackground && SessionState.mode == MODE_STEAM &&
             suspendPolicy != SessionPrefs.SUSPEND_NEVER && hidden && downloadActive && !suspendDownloadNow
+        if (suspendPolicy == SessionPrefs.SUSPEND_MANUAL && hidden && !downloadsBlockingSuspend) {
+            manualPauseRequested = true
+        }
+        val controller = suspendController ?: return
         if (downloadsBlockingSuspend) acquireLocks()
         val steamPause = SessionState.mode == MODE_STEAM && !downloadsBlockingSuspend && when (suspendPolicy) {
             SessionPrefs.SUSPEND_AUTO, SessionPrefs.SUSPEND_NATIVE -> hidden
@@ -1716,6 +1729,7 @@ class SessionService : Service() {
                     LinuxRuntime.rootDir(this@SessionService),
                     receivedBytes = TrafficStats.getUidRxBytes(android.os.Process.myUid()),
                     client = SessionState.steamClientArch,
+                    mounts = steamLibraryMounts,
                 )
                 if (wasActive != downloadActive) refreshNotification()
                 updateSuspendPolicy()
@@ -1734,7 +1748,9 @@ class SessionService : Service() {
             pads.add(String.format(java.util.Locale.ROOT, "\"%s\" (%04x:%04x)", d.name, d.vendorId, d.productId))
         }
         Log.i(TAG, "controllers at start: " + (if (pads.isEmpty()) "none" else pads.joinToString(", ")) +
-            "; presented to the guest as " + if (SessionState.deckPad) "switchable, starting as " + SessionPrefs.steamController(this) else "an Xbox 360 controller")
+            "; presented to the guest as " + if (SessionState.deckPad) "switchable, starting as " + SessionPrefs.steamController(this)
+            else if (SessionState.mode == MODE_STEAM && !SessionPrefs.builtinPad(this)) "one per connected controller, no built-in pad"
+            else "an Xbox 360 controller")
     }
 
     companion object {
