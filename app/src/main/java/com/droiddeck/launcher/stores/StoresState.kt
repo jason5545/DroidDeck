@@ -10,9 +10,6 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.droiddeck.launcher.stores.download.DownloadEntry
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 object StoresState {
     private const val TAG = "Stores"
@@ -79,7 +76,7 @@ object StoresState {
         val app = context.applicationContext
         com.droiddeck.launcher.stores.download.SavedQueue.restore(app)
         background("stores-refresh") {
-            val found = Store.entries.mapNotNull { store -> StoreAccounts.signedInAs(app, store)?.let { store to it } }
+            val found = Store.entries.mapNotNull { store -> StoreAccounts.displayName(app, store)?.let { store to it } }
             val onDisk = StoreInstallRoot.gameFolders(app).mapNotNull { folder ->
                 StoreGameSidecar.read(folder)?.takeIf { it.isInstalled }?.let { InstalledStoreGame(it, folder) }
             }
@@ -127,6 +124,10 @@ object StoresState {
     }
 
     fun installedGame(store: Store, id: String): InstalledStoreGame? = installed.firstOrNull { it.sidecar.store == store && it.sidecar.id == id }
+
+    fun detailItem(store: Store, id: String): CatalogItem? = detailCatalogItem(
+        store, id, library[store].orEmpty(), found[store].orEmpty(), shelves[store],
+    )
 
     fun open(context: Context, store: Store, force: Boolean = false) {
         val backend = backends[store] ?: return
@@ -198,32 +199,35 @@ object StoresState {
         askForNotifications(context)
         if (isUnfinished(item)) { install(context, item); return }
         val targets = StoreInstallRoot.targets(context)
-        if (targets.size > 1) pendingInstall = item else install(context, item, targets.first().root)
+        if (targets.size > 1 || StoreLanguage.selectable(item.store)) pendingInstall = item
+        else install(context, item, targets.first().root)
     }
 
-    fun install(context: Context, item: CatalogItem, root: java.io.File? = null) {
+    fun install(context: Context, item: CatalogItem, root: java.io.File? = null, language: String? = null) {
         val app = context.applicationContext
         val folder = StoreInstallRoot.folderFor(app, item.store, item.id, item.title, root ?: StoreInstallRoot.installRoot(app))
         val target = folder.parentFile!!.parentFile!!
-        val check = StoreInstallRoot.checkStorage(app, item, target)
+        val code = language?.takeIf { it.isNotBlank() } ?: StoreLanguage.preferredCode(app)
+        val tagged = if (StoreLanguage.selectable(item.store)) item.copy(extra = item.extra + (StoreLanguage.EXTRA to code)) else item
+        val check = StoreInstallRoot.checkStorage(app, tagged, target)
         if (!check.enough) {
             val errorMsg = check.errorMessage ?: app.getString(com.droiddeck.launcher.R.string.stores_storage_insufficient, formatBytes(check.requiredBytes), formatBytes(check.availableBytes))
             val entry = com.droiddeck.launcher.stores.download.DownloadEntry(
-                item.store,
-                item.id,
-                item.title,
-                cover = item.imageUrl,
-                bytesTotal = item.sizeBytes,
+                tagged.store,
+                tagged.id,
+                tagged.title,
+                cover = tagged.imageUrl,
+                bytesTotal = tagged.sizeBytes,
                 location = StoreInstallRoot.labelFor(app, folder)
             )
-            com.droiddeck.launcher.stores.download.SavedQueue.remember(app, item, target)
+            com.droiddeck.launcher.stores.download.SavedQueue.remember(app, tagged, target)
             com.droiddeck.launcher.stores.download.DownloadQueue.recordFailed(app, entry, errorMsg) {
-                install(app, item, target)
+                install(app, tagged, target, code)
             }
             return
         }
-        com.droiddeck.launcher.stores.download.SavedQueue.remember(app, item, target)
-        backends[item.store]?.install(app, item, target) ?: logLine("${item.store.label}: this build cannot install yet")
+        com.droiddeck.launcher.stores.download.SavedQueue.remember(app, tagged, target)
+        backends[tagged.store]?.install(app, tagged, target) ?: logLine("${tagged.store.label}: this build cannot install yet")
     }
 
     val uninstalling = mutableStateMapOf<String, Float>()
@@ -255,7 +259,7 @@ object StoresState {
         val text = StoreLog.redactLine(raw)
         Log.i(TAG, text)
         val app = appContext ?: return
-        StoreLogFiles.append(app, "${synchronized(CLOCK) { CLOCK.format(Date()) }}  $text")
+        StoreLogFiles.stamped(app, text)
     }
 
     private var appContext: Context? = null
@@ -288,8 +292,6 @@ object StoresState {
             }
         }, name).start()
     }
-
-    private val CLOCK = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
 }
 
 interface StoreBackend {

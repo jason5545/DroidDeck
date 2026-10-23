@@ -307,6 +307,8 @@
     <string name="mode_client">Cliente</string>
     <string name="mode_mangoapp">Superposición de rendimiento</string>
     <string name="mode_mangoapp_hint">Desactívalo si los juegos fallan o se quedan en negro en modo Deck. Se aplica en la próxima sesión.</string>
+    <string name="mode_return_after_game">Volver a DroidDeck al cerrar un juego</string>
+    <string name="mode_return_after_game_hint">Cuando se cierra un juego que iniciaste desde DroidDeck u otro lanzador, Steam se cierra correctamente (primero termina de sincronizar las partidas en la nube) y vuelves allí. Desactivado: te quedas en Steam.</string>
     <string name="mode_steam_repair">Reparar el cliente de Steam</string>
     <string name="mode_steam_repair_hint">Vuelve a descargar el cliente de Steam la próxima vez que se inicie Steam. Úsalo si Steam se queda en la pantalla de carga. Se conservan los juegos, la sesión iniciada y los ajustes.</string>
     <string name="mode_steam_repair_queued">El cliente de Steam se volverá a descargar la próxima vez que se inicie Steam.</string>
@@ -503,7 +505,9 @@
     <string name="comp_delete_original_title">¿Eliminar este original?</string>
     <string name="comp_delete_original_body">Este original de %1$s es de una versión anterior de %2$s. El original de la versión actual siempre se conserva.</string>
     <string name="comp_nightlies_count">En las Nightlies · %1$d</string>
-    <string name="comp_refresh_to_list">Actualiza para listar los paquetes de las Nightlies.</string>
+    <string name="comp_channel_stable">Estable</string>
+    <string name="comp_channel_nightly">Nocturna</string>
+    <string name="comp_refresh_to_list">Actualiza para listar los paquetes de Nightlies y DroidDeck.</string>
     <string name="comp_nothing_new">Nada nuevo desde la última comprobación.</string>
     <string name="comp_import_wcp">Importar .wcp</string>
     <string name="comp_restore_original">Restaurar el original de este Proton</string>
@@ -1413,6 +1417,14 @@
     <string name="theme_icon_blue_detail">Fondo negro, texto blanco y el azul para todo lo seleccionado, enfocado o pulsado.</string>
     <string name="theme_electric">Azul marino eléctrico</string>
     <string name="theme_electric_detail">Un azul más vivo, sobre superficies que tiran a azul marino en vez de gris.</string>
+    <string name="theme_gradient">Degradado</string>
+    <string name="theme_gradient_detail">Tus propios colores primario y secundario, combinados en botones y resaltados.</string>
+    <string name="theme_gradient_primary">Primario</string>
+    <string name="theme_gradient_secondary">Secundario</string>
+    <string name="theme_color_hue">Tono</string>
+    <string name="theme_color_saturation">Saturación</string>
+    <string name="theme_color_brightness">Brillo</string>
+    <string name="theme_color_hex">Color hexadecimal</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Insert</string>
     <string name="pckb_key_del">Supr</string>
@@ -1798,7 +1810,8 @@
     <string name="cmgr_original_kept">El original de la versión instalada se conserva: es el camino de vuelta.</string>
     <string name="cmgr_not_stored">No guardado</string>
     <string name="cmgr_deleted_original">Se eliminó el original de %1$s de %2$s.</string>
-    <string name="cmgr_nightlies_only">Las descargas solo proceden de las versiones Nightlies</string>
+    <string name="cmgr_nightlies_only">Las descargas solo proceden de las versiones de Nightlies y DroidDeck</string>
+    <string name="cmgr_nightly_replaced">Error en la descarga: puede que esta compilación nocturna se haya sustituido por una más reciente. Actualiza la lista y vuelve a intentarlo.</string>
     <string name="cmgr_list_predates_checksums">Esta lista de paquetes es anterior a las sumas de verificación - actualízala e inténtalo de nuevo</string>
     <string name="cmgr_checksum_mismatch">La suma de verificación no coincide</string>
 
@@ -2504,6 +2517,7 @@
     <string name="glasses_xreal_network_missing">Esperando la conexión Ethernet por USB de las gafas. Puede que este teléfono no la ofrezca a las apps.</string>
     <string name="glasses_xreal_connection_failed">La conexión con las XREAL se interrumpió o devolvió una respuesta no compatible. Reintentando…</string>
     <string name="glasses_xreal_experimental">Compatibilidad experimental con las 1S. Usa el modo Follow y desactiva la estabilización en el menú de las gafas. Aún falta probar en el dispositivo las direcciones del seguimiento y los modos de pantalla.</string>
+    <string name="glasses_pro2_experimental">Seguimiento de cabeza experimental para Pro 2. Los ajustes de brillo y volumen y el cambio de modo de pantalla aún no son compatibles.</string>
     <string name="stores_fact_developer">Desarrollador</string>
     <string name="stores_fact_publisher">Distribuidor</string>
     <string name="stores_fact_released">Lanzamiento</string>
@@ -2550,9 +2564,6 @@
     <string name="storage_tool_x64_client">Lo usa el cliente de Steam x86-64</string>
     <string name="storage_uninstall_in_x64">Esta copia está en el cliente de Steam x86-64. Elige x86-64 en Cliente de Steam y desinstálala aquí.</string>
     <string name="storage_uninstall_in_arm64">Esta copia está en el cliente de Steam ARM64. Elige ARM64 en Cliente de Steam y desinstálala aquí.</string>
-    <string name="mode_zram">Compresión zRAM</string>
-    <string name="mode_zram_hint">Mientras se ejecuta un juego, la memoria del cliente de Steam se comprime en la zram del dispositivo, lo que deja más RAM para el juego. Se aplica la próxima vez que se inicie Steam.</string>
-    <string name="mode_zram_unsupported">No disponible: este dispositivo no tiene swap activo, o su kernel es anterior a la 5.4.</string>
     <string name="stores_storage_insufficient">No hay suficiente espacio libre: se necesitan %1$s y solo hay %2$s libres</string>
     <string name="stores_storage_low">Espacio insuficiente (%1$s libres, se necesitan %2$s)</string>
     <string name="stores_target_free_unknown">Espacio libre desconocido</string>

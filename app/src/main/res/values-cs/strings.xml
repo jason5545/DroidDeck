@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">Automaticky pozastaví relaci a obnoví ji při zobrazení. Nativně nejprve připraví Steam na spánek. Manuálně čeká na Obnovit. Nikdy běh nezastavuje.</string>
     <string name="mode_background_downloads">Nechat stahování běžet</string>
     <string name="mode_background_downloads_hint">Oddálí pozastavení na pozadí, pokud Steam aktivně stahuje.</string>
-    <string name="mode_zram">Komprese zRAM</string>
-    <string name="mode_zram_hint">Během hraní se paměť klienta Steam komprimuje do zram zařízení, takže hra má víc RAM. Platí při příštím spuštění Steamu.</string>
-    <string name="mode_zram_unsupported">Není k dispozici: zařízení nemá zram ani swap, nebo je jádro starší než 5.4.</string>
     <string name="mode_suspend_note">Automaticky pozastaví na pozadí a obnoví při zobrazení. Manuálně čeká na Obnovit. Nikdy běh nezastavuje.</string>
     <string name="mode_startup">Spouštění</string>
     <string name="mode_steam_startup">Spustit Steam s DroidDeck</string>
@@ -508,7 +505,9 @@
     <string name="comp_delete_original_title">Smazat tento originál?</string>
     <string name="comp_delete_original_body">Tento originál %1$s je z dřívějšího sestavení %2$s. Originál aktuálního sestavení je vždy zachován.</string>
     <string name="comp_nightlies_count">Na Nightlies · %1$d</string>
-    <string name="comp_refresh_to_list">Obnovte pro zobrazení balíčků na Nightlies.</string>
+    <string name="comp_channel_stable">Stabilní</string>
+    <string name="comp_channel_nightly">Noční</string>
+    <string name="comp_refresh_to_list">Obnovte pro zobrazení balíčků na Nightlies a DroidDeck.</string>
     <string name="comp_nothing_new">Od poslední kontroly nic nového.</string>
     <string name="comp_import_wcp">Importovat .wcp</string>
     <string name="comp_restore_original">Obnovit originál tohoto Protonu</string>
@@ -1430,6 +1429,14 @@
     <string name="theme_icon_blue_detail">Černé pozadí, bílé písmo, modrá pro vše vybrané, zaměřené nebo stisknuté.</string>
     <string name="theme_electric">Elektrická modř</string>
     <string name="theme_electric_detail">Jasnější modrá na povrchách, které jsou spíše tmavomodré než šedé.</string>
+    <string name="theme_gradient">Přechod</string>
+    <string name="theme_gradient_detail">Vaše vlastní primární a sekundární barva, prolnuté na tlačítkách a zvýrazněních.</string>
+    <string name="theme_gradient_primary">Primární</string>
+    <string name="theme_gradient_secondary">Sekundární</string>
+    <string name="theme_color_hue">Odstín</string>
+    <string name="theme_color_saturation">Sytost</string>
+    <string name="theme_color_brightness">Jas</string>
+    <string name="theme_color_hex">Barva hex</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1822,7 +1829,8 @@
     <string name="cmgr_original_kept">Původní verze nainstalovaného sestavení je zachována: je to cesta zpět.</string>
     <string name="cmgr_not_stored">Není uloženo</string>
     <string name="cmgr_deleted_original">Odstraněna původní verze %2$s z %1$s.</string>
-    <string name="cmgr_nightlies_only">Stahování pochází jen z vydání Nightlies</string>
+    <string name="cmgr_nightlies_only">Stahování pochází jen z vydání Nightlies a DroidDeck</string>
+    <string name="cmgr_nightly_replaced">Stažení selhalo: tento noční build mohl být nahrazen novějším. Obnovte seznam a zkuste to znovu.</string>
     <string name="cmgr_list_predates_checksums">Tento seznam balíčků předchází kontrolním součtům - obnovte ho a zkuste to znovu</string>
     <string name="cmgr_checksum_mismatch">Neshoda kontrolního součtu</string>
 
@@ -2546,6 +2554,7 @@
     <string name="glasses_xreal_network_missing">Čeká se na připojení USB Ethernet brýlí. Tento telefon ho možná aplikacím nezpřístupňuje.</string>
     <string name="glasses_xreal_connection_failed">Připojení XREAL bylo přerušeno nebo vrátilo nepodporovanou odpověď. Zkouší se to znovu…</string>
     <string name="glasses_xreal_experimental">Experimentální podpora 1S. V nabídce brýlí použijte režim Follow a vypněte stabilizaci. Směry sledování a režimy zobrazení je ještě třeba otestovat na zařízení.</string>
+    <string name="glasses_pro2_experimental">Experimentální sledování pohybu hlavy pro Pro 2. Nastavení jasu, hlasitosti a přepínání režimů zobrazení zatím nejsou podporovány.</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Režim Cardboard</string>
     <string name="cardboard_mode_hint">Obraz pro levé a pravé oko pro VR brýle pro telefon.</string>

@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">ऑटो दिखने पर रुकता है और फिर से शुरू होता है। नेटिव पहले Steam को स्लीप के लिए तैयार करता है। मैनुअल फिर से शुरू करें का इंतज़ार करता है। कभी नहीं वाला चलता रहता है।</string>
     <string name="mode_background_downloads">डाउनलोड चलते रहने दें</string>
     <string name="mode_background_downloads_hint">Steam के सक्रिय रूप से डाउनलोड करते समय बैकग्राउंड सस्पेंशन को टालें।</string>
-    <string name="mode_zram">zRAM कम्प्रेशन</string>
-    <string name="mode_zram_hint">गेम चलने के दौरान Steam क्लाइंट की मेमोरी डिवाइस के zram में कम्प्रेस होती है, जिससे गेम को ज़्यादा RAM मिलती है। अगली बार Steam शुरू होने पर लागू होगा।</string>
-    <string name="mode_zram_unsupported">उपलब्ध नहीं: इस डिवाइस में zram या swap नहीं है, या कर्नेल 5.4 से पुराना है।</string>
     <string name="mode_suspend_note">ऑटो बैकग्राउंड में रुकता है और दिखने पर फिर से शुरू होता है। मैनुअल फिर से शुरू करें का इंतज़ार करता है। कभी नहीं वाला चलता रहता है।</string>
     <string name="mode_startup">स्टार्टअप</string>
     <string name="mode_steam_startup">DroidDeck के साथ Steam शुरू करें</string>
@@ -504,7 +501,9 @@
     <string name="comp_delete_original_title">यह ओरिजिनल हटाएं?</string>
     <string name="comp_delete_original_body">यह %1$s ओरिजिनल %2$s के पहले वाले बिल्ड से है। मौजूदा बिल्ड का ओरिजिनल हमेशा रखा जाता है।</string>
     <string name="comp_nightlies_count">Nightlies पर · %1$d</string>
-    <string name="comp_refresh_to_list">Nightlies के पैकेज सूचीबद्ध करने के लिए रीफ़्रेश करें।</string>
+    <string name="comp_channel_stable">स्थिर</string>
+    <string name="comp_channel_nightly">नाइटली</string>
+    <string name="comp_refresh_to_list">Nightlies और DroidDeck के पैकेज सूचीबद्ध करने के लिए रीफ़्रेश करें।</string>
     <string name="comp_nothing_new">पिछली जांच के बाद कुछ नया नहीं है।</string>
     <string name="comp_import_wcp">.wcp इंपोर्ट करें</string>
     <string name="comp_restore_original">इस Proton का ओरिजिनल वापस लाएं</string>
@@ -1402,6 +1401,14 @@
     <string name="theme_icon_blue_detail">काली ज़मीन, सफ़ेद टाइप, चुने, फ़ोकस या दबाए गए हर चीज़ के लिए ब्लू रंग।</string>
     <string name="theme_electric">इलेक्ट्रिक नेवी</string>
     <string name="theme_electric_detail">ब्लू रंग ज़्यादा चमकीला, उन सतहों पर जो ग्रे के बजाय नेवी की ओर झुकती हैं।</string>
+    <string name="theme_gradient">ग्रेडिएंट</string>
+    <string name="theme_gradient_detail">आपके अपने प्राथमिक और द्वितीयक रंग, बटनों और हाइलाइट पर मिश्रित।</string>
+    <string name="theme_gradient_primary">प्राथमिक</string>
+    <string name="theme_gradient_secondary">द्वितीयक</string>
+    <string name="theme_color_hue">रंगत</string>
+    <string name="theme_color_saturation">संतृप्ति</string>
+    <string name="theme_color_brightness">चमक</string>
+    <string name="theme_color_hex">हेक्स रंग</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1780,7 +1787,8 @@
     <string name="cmgr_original_kept">इंस्टॉल किए बिल्ड का ओरिजिनल रखा गया है: यह वापस जाने का रास्ता है।</string>
     <string name="cmgr_not_stored">सेव नहीं है</string>
     <string name="cmgr_deleted_original">%2$s का %1$s ओरिजिनल हटाया गया।</string>
-    <string name="cmgr_nightlies_only">डाउनलोड सिर्फ़ Nightlies रिलीज़ से आते हैं</string>
+    <string name="cmgr_nightlies_only">डाउनलोड सिर्फ़ Nightlies और DroidDeck रिलीज़ से आते हैं</string>
+    <string name="cmgr_nightly_replaced">डाउनलोड विफल: हो सकता है यह नाइटली बिल्ड किसी नए बिल्ड से बदल दिया गया हो। सूची रीफ़्रेश करें और फिर से कोशिश करें।</string>
     <string name="cmgr_list_predates_checksums">यह पैकेज लिस्ट चेकसम से पुरानी है - इसे रीफ़्रेश करें और फिर कोशिश करें</string>
     <string name="cmgr_checksum_mismatch">चेकसम मेल नहीं खाया</string>
 
@@ -2496,6 +2504,7 @@
     <string name="glasses_xreal_network_missing">चश्मे के USB Ethernet कनेक्शन का इंतज़ार है। हो सकता है यह फ़ोन इसे ऐप्स को उपलब्ध न कराए।</string>
     <string name="glasses_xreal_connection_failed">XREAL कनेक्शन टूट गया या उसने ऐसा जवाब दिया जो समर्थित नहीं है। फिर से कोशिश हो रही है…</string>
     <string name="glasses_xreal_experimental">1S के लिए प्रायोगिक सपोर्ट। चश्मे के मेनू में Follow मोड चुनें और स्टेबिलाइज़ेशन बंद करें। ट्रैकिंग की दिशाएं और डिस्प्ले मोड अभी डिवाइस पर टेस्ट होने बाकी हैं।</string>
+    <string name="glasses_pro2_experimental">Pro 2 के लिए प्रायोगिक हेड ट्रैकिंग। चमक और वॉल्यूम बदलना और डिस्प्ले मोड स्विच करना अभी समर्थित नहीं है।</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Cardboard मोड</string>
     <string name="cardboard_mode_hint">फ़ोन VR व्यूअर के लिए बाईं और दाईं आंख के व्यू।</string>

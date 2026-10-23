@@ -292,9 +292,6 @@
     <string name="mode_suspend_steam_note">自動：在背景時暫停，回到前景時繼續。原生：先讓 Steam 準備睡眠。手動：等你按「繼續」。永不：持續執行。</string>
     <string name="mode_background_downloads">下載時不暫停</string>
     <string name="mode_background_downloads_hint">Steam 正在下載時，延後背景暫停。</string>
-    <string name="mode_zram">zRAM 壓縮</string>
-    <string name="mode_zram_hint">遊戲執行時，把 Steam 用戶端的記憶體壓縮進裝置的 zram，讓遊戲有更多 RAM 可用。下次啟動 Steam 時生效。</string>
-    <string name="mode_zram_unsupported">無法使用：這部裝置沒有 zram 或 swap，或核心版本早於 5.4。</string>
     <string name="mode_suspend_note">自動：在背景時暫停，回到前景時繼續。手動：等你按「繼續」。永不：持續執行。</string>
     <string name="mode_startup">啟動</string>
     <string name="mode_steam_startup">開啟 DroidDeck 時啟動 Steam</string>
@@ -321,6 +318,8 @@
     <string name="mode_client">用戶端</string>
     <string name="mode_mangoapp">效能疊加資訊</string>
     <string name="mode_mangoapp_hint">如果遊戲在 Deck 模式下崩潰或黑畫面，請關閉。下次工作階段生效。</string>
+    <string name="mode_return_after_game">遊戲結束後回到 DroidDeck</string>
+    <string name="mode_return_after_game_hint">從 DroidDeck 或其他啟動器開啟的遊戲關閉時，Steam 會正常結束（先等雲端存檔同步完），再回到原本的地方。關閉時留在 Steam。</string>
     <string name="mode_steam_repair">修復 Steam 用戶端</string>
     <string name="mode_steam_repair_hint">下次啟動 Steam 時重新下載用戶端。Steam 一直停在載入畫面時使用。遊戲、登入狀態和設定都會保留。</string>
     <string name="mode_steam_repair_queued">下次啟動 Steam 時會重新下載用戶端。</string>
@@ -513,7 +512,9 @@
     <string name="comp_delete_original_title">要刪除這個原版嗎？</string>
     <string name="comp_delete_original_body">這個 %1$s 原版來自 %2$s 較早的版本。目前版本的原版一定會保留。</string>
     <string name="comp_nightlies_count">Nightlies 上 · %1$d</string>
-    <string name="comp_refresh_to_list">重新整理以列出 Nightlies 上的套件。</string>
+    <string name="comp_channel_stable">穩定版</string>
+    <string name="comp_channel_nightly">每夜版</string>
+    <string name="comp_refresh_to_list">重新整理以列出 Nightlies 和 DroidDeck 發行版本上的套件。</string>
     <string name="comp_nothing_new">上次檢查後沒有新東西。</string>
     <string name="comp_import_wcp">匯入 .wcp</string>
     <string name="comp_restore_original">還原這個 Proton 的原版</string>
@@ -1200,6 +1201,8 @@
     <string name="pip_auto">自動進入子母畫面</string>
     <string name="unfolded_controls">展開螢幕上的控制項</string>
     <string name="unfolded_controls_hint">展開時，遊戲畫面在 Steam Deck 觸控板和背鍵上方；摺疊時，遊戲全螢幕顯示。</string>
+    <string name="unfolded_controls_with_controller">連接控制器時也保留</string>
+    <string name="unfolded_controls_with_controller_hint">連接控制器時，展開螢幕上的控制項照樣顯示，適合夾住手機的控制器。</string>
     <string name="pip_suspended">已暫停</string>
     <string name="pip_not_ready">工作階段準備好後才能使用子母畫面。</string>
     <string name="pip_permission">請在 Android 設定裡允許 DroidDeck 使用子母畫面。</string>
@@ -1433,6 +1436,14 @@
     <string name="theme_icon_blue_detail">黑色背景、白色文字，選取、聚焦或按下的項目使用藍色。</string>
     <string name="theme_electric">電光藏青</string>
     <string name="theme_electric_detail">更亮的藍色，搭配偏藏青而非灰色的介面。</string>
+    <string name="theme_gradient">漸層</string>
+    <string name="theme_gradient_detail">自己選的主色和輔色，以漸層呈現在按鈕和選取的項目上。</string>
+    <string name="theme_gradient_primary">主色</string>
+    <string name="theme_gradient_secondary">輔色</string>
+    <string name="theme_color_hue">色相</string>
+    <string name="theme_color_saturation">飽和度</string>
+    <string name="theme_color_brightness">亮度</string>
+    <string name="theme_color_hex">十六進位色碼</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1793,7 +1804,8 @@
     <string name="cmgr_original_kept">已安裝組建的原始版本會保留，以便還原。</string>
     <string name="cmgr_not_stored">未儲存</string>
     <string name="cmgr_deleted_original">已刪除 %2$s 來自 %1$s 的原始版本。</string>
-    <string name="cmgr_nightlies_only">只會從 Nightlies 發行版本下載</string>
+    <string name="cmgr_nightlies_only">只會從 Nightlies 和 DroidDeck 發行版本下載</string>
+    <string name="cmgr_nightly_replaced">下載失敗：這個每夜版可能已經被更新的版本取代。請重新整理清單再試一次。</string>
     <string name="cmgr_list_predates_checksums">這個套件清單早於校驗碼機制，請重新整理後再試一次</string>
     <string name="cmgr_checksum_mismatch">校驗碼不符</string>
     <string name="sprefs_upscaler_linear">線性</string>
@@ -1827,6 +1839,7 @@
     <string name="gpuinfo_not_adreno">不是 Adreno GPU</string>
     <string name="gpuinfo_supported">受支援</string>
     <string name="gpuinfo_experimental">實驗性：其驅動程式為測試版本</string>
+    <string name="gpuinfo_a850_experimental">Adreno 850 的支援還在實驗階段：需要相容的實驗性顯示驅動程式和遊戲驅動程式，還沒在這部裝置上驗證過</string>
     <string name="gpuinfo_below_tested">低於已測試的硬體（Adreno 725 及更新機型）：可能無法執行</string>
     <string name="gpuinfo_unsupported">不受支援：DroidDeck 需要 Adreno（Snapdragon）GPU</string>
     <string name="turnip_rate_limited">已達 GitHub 速率限制，請稍後再試</string>
@@ -2129,6 +2142,9 @@
     <string name="stores_download_manager">下載管理</string>
     <string name="stores_parallel">同時下載數</string>
     <string name="stores_install_where">安裝到</string>
+    <string name="stores_install_language">遊戲語言</string>
+    <string name="stores_install_language_hint">GOG 和 Epic 會安裝這個語言。選「系統」就跟著 App 的語言。</string>
+    <string name="stores_install_language_system">系統</string>
     <string name="stores_install_title">安裝 %1$s：</string>
     <string name="stores_target_internal">內部儲存空間</string>
     <string name="stores_target_free">可用 %1$s</string>
@@ -2553,6 +2569,7 @@
     <string name="glasses_xreal_network_missing">正在等待眼鏡的 USB 乙太網路連線。這支手機可能沒有把它開放給應用程式。</string>
     <string name="glasses_xreal_connection_failed">XREAL 連線中斷，或傳回不支援的回應。正在重試…</string>
     <string name="glasses_xreal_experimental">1S 支援還在實驗階段。請在眼鏡選單中使用跟隨模式，並關閉畫面穩定。追蹤方向和顯示模式還需要實機測試。</string>
+    <string name="glasses_pro2_experimental">Pro 2 的頭部追蹤還在實驗階段。亮度、音量和顯示切換還不支援。</string>
     <string name="display_picture_position">畫面位置</string>
     <string name="display_position_top">靠上</string>
     <string name="display_position_bottom">靠下</string>

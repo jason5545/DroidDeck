@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">Tự động tạm dừng và tiếp tục khi được hiển thị lại. Gốc chuẩn bị Steam để ngủ trước. Thủ công chờ nhấn Tiếp tục. Không bao giờ giữ nó luôn chạy.</string>
     <string name="mode_background_downloads">Giữ tải xuống tiếp tục chạy</string>
     <string name="mode_background_downloads_hint">Trì hoãn tạm dừng nền khi Steam đang tải xuống.</string>
-    <string name="mode_zram">Nén zRAM</string>
-    <string name="mode_zram_hint">Khi chơi, bộ nhớ của ứng dụng Steam được nén vào zram của thiết bị để game có thêm RAM. Áp dụng từ lần khởi động Steam tiếp theo.</string>
-    <string name="mode_zram_unsupported">Không khả dụng: thiết bị không có zram hoặc swap, hoặc nhân cũ hơn 5.4.</string>
     <string name="mode_suspend_note">Tự động tạm dừng ở nền và tiếp tục khi hiển thị lại. Thủ công chờ nhấn Tiếp tục. Không bao giờ giữ nó luôn chạy.</string>
     <string name="mode_startup">Khởi động</string>
     <string name="mode_steam_startup">Khởi động Steam cùng DroidDeck</string>
@@ -502,7 +499,9 @@
     <string name="comp_delete_original_title">Xóa bản gốc này?</string>
     <string name="comp_delete_original_body">Bản gốc %1$s này là từ một build trước của %2$s. Bản gốc của build hiện tại luôn được giữ lại.</string>
     <string name="comp_nightlies_count">Trên Nightlies · %1$d</string>
-    <string name="comp_refresh_to_list">Làm mới để liệt kê các gói trên Nightlies.</string>
+    <string name="comp_channel_stable">Ổn định</string>
+    <string name="comp_channel_nightly">Nightly</string>
+    <string name="comp_refresh_to_list">Làm mới để liệt kê các gói trên Nightlies và DroidDeck.</string>
     <string name="comp_nothing_new">Không có gì mới từ lần kiểm tra trước.</string>
     <string name="comp_import_wcp">Nhập tệp .wcp</string>
     <string name="comp_restore_original">Khôi phục bản gốc của Proton này</string>
@@ -1388,6 +1387,14 @@
     <string name="theme_icon_blue_detail">Nền đen, chữ trắng, xanh cho mọi thứ được chọn, lấy nét hoặc nhấn.</string>
     <string name="theme_electric">Xanh điện navy</string>
     <string name="theme_electric_detail">Màu xanh sáng hơn, trên các bề mặt nghiêng về navy thay vì xám.</string>
+    <string name="theme_gradient">Chuyển màu</string>
+    <string name="theme_gradient_detail">Màu chính và màu phụ do bạn chọn, hòa trộn trên các nút và phần nổi bật.</string>
+    <string name="theme_gradient_primary">Chính</string>
+    <string name="theme_gradient_secondary">Phụ</string>
+    <string name="theme_color_hue">Sắc độ</string>
+    <string name="theme_color_saturation">Độ bão hòa</string>
+    <string name="theme_color_brightness">Độ sáng</string>
+    <string name="theme_color_hex">Màu hex</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1759,7 +1766,8 @@
     <string name="cmgr_original_kept">Bản gốc của build đã cài được giữ lại: đó là đường quay về.</string>
     <string name="cmgr_not_stored">Chưa được lưu</string>
     <string name="cmgr_deleted_original">Đã xóa bản gốc %1$s của %2$s.</string>
-    <string name="cmgr_nightlies_only">Lượt tải chỉ đến từ các bản phát hành Nightlies</string>
+    <string name="cmgr_nightlies_only">Lượt tải chỉ đến từ các bản phát hành Nightlies và DroidDeck</string>
+    <string name="cmgr_nightly_replaced">Tải xuống thất bại: bản nightly này có thể đã được thay bằng bản mới hơn. Hãy làm mới danh sách và thử lại.</string>
     <string name="cmgr_list_predates_checksums">Danh sách gói này có trước checksum - hãy làm mới và thử lại</string>
     <string name="cmgr_checksum_mismatch">Checksum không khớp</string>
 
@@ -2471,6 +2479,7 @@
     <string name="glasses_xreal_network_missing">Đang chờ kết nối USB Ethernet của kính. Điện thoại này có thể không cho ứng dụng truy cập kết nối đó.</string>
     <string name="glasses_xreal_connection_failed">Kết nối XREAL bị gián đoạn hoặc trả về phản hồi không được hỗ trợ. Đang thử lại…</string>
     <string name="glasses_xreal_experimental">Hỗ trợ 1S thử nghiệm. Dùng chế độ Follow và tắt ổn định hình ảnh trong menu của kính. Hướng theo dõi và các chế độ hiển thị vẫn cần thử nghiệm trên thiết bị.</string>
+    <string name="glasses_pro2_experimental">Theo dõi chuyển động đầu thử nghiệm cho Pro 2. Chưa hỗ trợ điều chỉnh độ sáng, âm lượng và chuyển chế độ hiển thị.</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Chế độ Cardboard</string>
     <string name="cardboard_mode_hint">Hình cho mắt trái và mắt phải dành cho kính VR điện thoại.</string>

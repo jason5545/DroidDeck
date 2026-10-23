@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">Az Automatikus szüneteltet, és megjelenéskor folytatja. A Natív előbb felkészíti a Steamet az altatásra. A Manuális megvárja a Folytatást. A Soha mindig futva tartja.</string>
     <string name="mode_background_downloads">Letöltések futtatásának fenntartása</string>
     <string name="mode_background_downloads_hint">Elhalasztja a háttérbeli felfüggesztést, amíg a Steam aktívan letölt.</string>
-    <string name="mode_zram">zRAM-tömörítés</string>
-    <string name="mode_zram_hint">Játék közben a Steam kliens memóriája a készülék zramjába tömörül, így a játéknak több RAM jut. A Steam következő indításakor lép életbe.</string>
-    <string name="mode_zram_unsupported">Nem elérhető: a készüléken nincs zram vagy swap, vagy a kernel régebbi az 5.4-nél.</string>
     <string name="mode_suspend_note">Az Automatikus szüneteltet a háttérben, és megjelenéskor folytatja. A Manuális megvárja a Folytatást. A Soha mindig futva tartja.</string>
     <string name="mode_startup">Indítás</string>
     <string name="mode_steam_startup">Steam indítása a DroidDeckkel</string>
@@ -504,7 +501,9 @@
     <string name="comp_delete_original_title">Törli ezt az eredetit?</string>
     <string name="comp_delete_original_body">Ez a %1$s eredeti a %2$s egy korábbi buildjéből származik. Az aktuális build eredetije mindig megmarad.</string>
     <string name="comp_nightlies_count">A Nightliesen · %1$d</string>
-    <string name="comp_refresh_to_list">Frissítsen a Nightliesen lévő csomagok listázásához.</string>
+    <string name="comp_channel_stable">Stabil</string>
+    <string name="comp_channel_nightly">Nightly</string>
+    <string name="comp_refresh_to_list">Frissítsen a Nightlies és a DroidDeck csomagjainak listázásához.</string>
     <string name="comp_nothing_new">Nincs semmi új az utolsó ellenőrzés óta.</string>
     <string name="comp_import_wcp">.wcp importálása</string>
     <string name="comp_restore_original">Ennek a Protonnak az eredetijének visszaállítása</string>
@@ -1402,6 +1401,14 @@
     <string name="theme_icon_blue_detail">Fekete alap, fehér betűk, a kék minden kijelölt, fókuszált vagy lenyomott elemhez.</string>
     <string name="theme_electric">Elektromos tengerészkék</string>
     <string name="theme_electric_detail">Fényesebb kék, szürke helyett tengerészkék felületeken.</string>
+    <string name="theme_gradient">Színátmenet</string>
+    <string name="theme_gradient_detail">Saját elsődleges és másodlagos színed, átmenettel a gombokon és a kiemeléseken.</string>
+    <string name="theme_gradient_primary">Elsődleges</string>
+    <string name="theme_gradient_secondary">Másodlagos</string>
+    <string name="theme_color_hue">Színárnyalat</string>
+    <string name="theme_color_saturation">Telítettség</string>
+    <string name="theme_color_brightness">Fényerő</string>
+    <string name="theme_color_hex">Hex szín</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1780,7 +1787,8 @@
     <string name="cmgr_original_kept">A telepített build eredetije megmarad: ez a visszaút.</string>
     <string name="cmgr_not_stored">Nincs tárolva</string>
     <string name="cmgr_deleted_original">A %2$s %1$s eredetije törölve.</string>
-    <string name="cmgr_nightlies_only">A letöltések csak a Nightlies kiadásokból érkeznek</string>
+    <string name="cmgr_nightlies_only">A letöltések csak a Nightlies és a DroidDeck kiadásokból érkeznek</string>
+    <string name="cmgr_nightly_replaced">A letöltés sikertelen: lehet, hogy ezt a nightly buildet egy újabb váltotta. Frissítse a listát, és próbálja újra.</string>
     <string name="cmgr_list_predates_checksums">Ez a csomaglista régebbi, mint az ellenőrzőösszegek – frissítse, és próbálja újra</string>
     <string name="cmgr_checksum_mismatch">Az ellenőrzőösszeg nem egyezik</string>
 
@@ -2496,6 +2504,7 @@
     <string name="glasses_xreal_network_missing">Várakozás a szemüveg USB-s Ethernet-kapcsolatára. Lehet, hogy ez a telefon nem teszi elérhetővé az alkalmazások számára.</string>
     <string name="glasses_xreal_connection_failed">Az XREAL-kapcsolat megszakadt, vagy nem támogatott választ adott. Újrapróbálkozás…</string>
     <string name="glasses_xreal_experimental">Kísérleti 1S-támogatás. Használja a Follow módot, és kapcsolja ki a stabilizálást a szemüveg menüjében. A követési irányokat és a megjelenítési módokat még tesztelni kell az eszközön.</string>
+    <string name="glasses_pro2_experimental">Kísérleti fejkövetés a Pro 2-höz. A fényerő és a hangerő beállítása, valamint a megjelenítési mód váltása még nem támogatott.</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Cardboard mód</string>
     <string name="cardboard_mode_hint">Bal és jobb szem képe telefonos VR-szemüveghez.</string>

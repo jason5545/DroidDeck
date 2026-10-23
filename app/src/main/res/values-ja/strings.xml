@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">自動では一時停止し、表示すると再開します。ネイティブでは先にSteamをスリープに備えさせます。手動では「再開」をタップするまで待機します。「しない」では実行し続けます。</string>
     <string name="mode_background_downloads">ダウンロードを継続</string>
     <string name="mode_background_downloads_hint">Steamがダウンロード中は、バックグラウンドでの一時停止を遅らせます。</string>
-    <string name="mode_zram">zRAM 圧縮</string>
-    <string name="mode_zram_hint">ゲームの実行中、Steam クライアントのメモリがデバイスの zram に圧縮され、ゲーム用のメモリが増えます。次回 Steam を起動したときに反映されます。</string>
-    <string name="mode_zram_unsupported">使用できません：このデバイスに zram もしくは swap がないか、カーネルが 5.4 未満です。</string>
     <string name="mode_suspend_note">自動ではバックグラウンドで一時停止し、表示すると再開します。手動では「再開」をタップするまで待機します。「しない」では実行し続けます。</string>
     <string name="mode_startup">起動</string>
     <string name="mode_steam_startup">DroidDeck起動時にSteamを起動</string>
@@ -310,6 +307,8 @@
     <string name="mode_client">クライアント</string>
     <string name="mode_mangoapp">パフォーマンスオーバーレイ</string>
     <string name="mode_mangoapp_hint">Deckモードでゲームがクラッシュしたり画面が真っ暗になる場合は、これをオフにしてください。次回のセッションで有効になります。</string>
+    <string name="mode_return_after_game">ゲーム終了後にDroidDeckへ戻る</string>
+    <string name="mode_return_after_game_hint">DroidDeckや他のランチャーから起動したゲームを閉じると、Steamが正しく終了し（クラウドセーブの同期を先に完了）、起動元に戻ります。オフ：Steamに留まります。</string>
     <string name="mode_steam_repair">Steamクライアントを修復</string>
     <string name="mode_steam_repair_hint">次回Steamの起動時にSteamクライアントを再ダウンロードします。Steamが読み込み画面のまま進まない場合に使用してください。ゲーム、ログイン情報、設定は保持されます。</string>
     <string name="mode_steam_repair_queued">次回Steamの起動時にSteamクライアントを再ダウンロードします。</string>
@@ -502,7 +501,9 @@
     <string name="comp_delete_original_title">この元のバージョンを削除しますか？</string>
     <string name="comp_delete_original_body">この%1$sの元のバージョンは、%2$sの以前のビルドのものです。現在のビルドの元のバージョンは常に保持されます。</string>
     <string name="comp_nightlies_count">Nightlies内 · %1$d</string>
-    <string name="comp_refresh_to_list">更新してNightliesのパッケージを一覧表示します。</string>
+    <string name="comp_channel_stable">安定版</string>
+    <string name="comp_channel_nightly">ナイトリー</string>
+    <string name="comp_refresh_to_list">更新してNightliesとDroidDeckのパッケージを一覧表示します。</string>
     <string name="comp_nothing_new">前回の確認以降、新しいものはありません。</string>
     <string name="comp_import_wcp">.wcpをインポート</string>
     <string name="comp_restore_original">このProtonの元のファイルを復元</string>
@@ -1388,6 +1389,14 @@
     <string name="theme_icon_blue_detail">黒の背景に白の文字、選択・フォーカス・押下時には青を使用します。</string>
     <string name="theme_electric">エレクトリックネイビー</string>
     <string name="theme_electric_detail">より明るい青を、グレーではなくネイビー寄りの画面に使用します。</string>
+    <string name="theme_gradient">グラデーション</string>
+    <string name="theme_gradient_detail">自分で選んだプライマリとセカンダリの色を、ボタンやハイライトにグラデーションで使います。</string>
+    <string name="theme_gradient_primary">プライマリ</string>
+    <string name="theme_gradient_secondary">セカンダリ</string>
+    <string name="theme_color_hue">色相</string>
+    <string name="theme_color_saturation">彩度</string>
+    <string name="theme_color_brightness">明度</string>
+    <string name="theme_color_hex">16進カラー</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1759,7 +1768,8 @@
     <string name="cmgr_original_kept">インストール済みビルドの元のファイルは、元に戻すために保持されます。</string>
     <string name="cmgr_not_stored">保存されていません</string>
     <string name="cmgr_deleted_original">%2$sの%1$s版の元のファイルを削除しました。</string>
-    <string name="cmgr_nightlies_only">ダウンロードはNightliesのリリースからのみ行われます</string>
+    <string name="cmgr_nightlies_only">ダウンロードはNightliesとDroidDeckのリリースからのみ行われます</string>
+    <string name="cmgr_nightly_replaced">ダウンロードに失敗しました：このナイトリービルドは新しいビルドに置き換えられた可能性があります。一覧を更新してもう一度お試しください。</string>
     <string name="cmgr_list_predates_checksums">このパッケージ一覧はチェックサム導入前のものです。更新してからもう一度お試しください</string>
     <string name="cmgr_checksum_mismatch">チェックサムが一致しません</string>
 
@@ -2471,6 +2481,7 @@
     <string name="glasses_xreal_network_missing">グラスの USB Ethernet 接続を待っています。このスマートフォンでは、アプリがこの接続を利用できない場合があります。</string>
     <string name="glasses_xreal_connection_failed">XREAL との接続が中断されたか、サポートされていない応答が返されました。再試行しています…</string>
     <string name="glasses_xreal_experimental">1S のサポートは試験運用中です。グラスのメニューで Follow モードを使い、安定化をオフにしてください。トラッキングの方向と表示モードは、まだ実機でのテストが必要です。</string>
+    <string name="glasses_pro2_experimental">Pro 2 のヘッドトラッキングは試験運用中です。明るさと音量の調整、および表示モードの切り替えにはまだ対応していません。</string>
     <string name="stores_fact_developer">開発元</string>
     <string name="stores_fact_publisher">パブリッシャー</string>
     <string name="stores_fact_released">発売日</string>

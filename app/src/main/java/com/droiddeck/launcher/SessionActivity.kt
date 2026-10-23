@@ -112,7 +112,7 @@ import com.droiddeck.launcher.ui.HudText
 import com.droiddeck.launcher.ui.LoadingOverlay
 import com.droiddeck.launcher.ui.SessionDrawer
 import com.droiddeck.launcher.ui.SessionPausedOverlay
-import com.droiddeck.launcher.ui.SecondScreenWindow
+import com.droiddeck.launcher.ui.SecondScreenPresentation
 import com.droiddeck.launcher.ui.DroidDeckTheme
 import com.droiddeck.launcher.wayland.CompositorHost
 import com.droiddeck.launcher.wayland.WaylandCompositor
@@ -134,6 +134,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
     private var pipUi by mutableStateOf(false)
     private var pipAutoEnter by mutableStateOf(false)
     private var unfoldedControls by mutableStateOf(false)
+    private var unfoldedControlsWithController by mutableStateOf(false)
     private var picturePosition by mutableStateOf("center")
 
     private fun applyGameAlignment() {
@@ -366,14 +367,43 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
     private var secondScreenDisplays by mutableStateOf<List<SecondScreenDisplay>>(emptyList())
     private var selectedSecondScreenDisplay by mutableStateOf(SessionState.secondScreenDisplay)
     private var started = false
+    private var sessionActivityDisplayId = Display.DEFAULT_DISPLAY
     private lateinit var displayManager: DisplayManager
-    private var secondScreenPresentation: SecondScreenWindow? = null
+    private var secondScreenPresentation: SecondScreenPresentation? = null
     private val displayListener = object : DisplayManager.DisplayListener {
-        override fun onDisplayAdded(displayId: Int) = refreshSecondScreenDisplays()
-        override fun onDisplayRemoved(displayId: Int) = refreshSecondScreenDisplays()
+        override fun onDisplayAdded(displayId: Int) {
+            notifyActivityDisplayStateChanged(displayId)
+            refreshSecondScreenDisplays()
+        }
+        override fun onDisplayRemoved(displayId: Int) {
+            if (refreshActivityDisplayId() && started) {
+                SessionService.setActivityDisplay(this@SessionActivity, sessionActivityDisplayId)
+            }
+            refreshSecondScreenDisplays()
+        }
         override fun onDisplayChanged(displayId: Int) {
+            notifyActivityDisplayStateChanged(displayId)
             followPanelRefresh(displayId)
             refreshSecondScreenDisplays()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun currentActivityDisplayId(): Int = windowManager.defaultDisplay.displayId
+
+    private fun refreshActivityDisplayId(): Boolean {
+        val current = if (Build.VERSION.SDK_INT >= 30) display?.displayId ?: currentActivityDisplayId()
+            else currentActivityDisplayId()
+        val changed = sessionActivityDisplayId != current
+        sessionActivityDisplayId = current
+        SessionState.activityDisplayId = current
+        return changed
+    }
+
+    private fun notifyActivityDisplayStateChanged(changedDisplayId: Int) {
+        val changed = refreshActivityDisplayId()
+        if (started && (changed || changedDisplayId == sessionActivityDisplayId)) {
+            SessionService.setActivityDisplay(this, sessionActivityDisplayId)
         }
     }
 
@@ -923,6 +953,8 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
                     },
                     unfoldedControls = if (com.droiddeck.launcher.session.SessionDisplay.foldable(this@SessionActivity)) unfoldedControls else null,
                     onUnfoldedControls = ::chooseUnfoldedControls,
+                    unfoldedControlsWithController = unfoldedControlsWithController,
+                    onUnfoldedControlsWithController = ::chooseUnfoldedControlsWithController,
                     onBackground = { drawerOpen = false; pip.background(); moveTaskToBack(true) },
                     onShareLogs = { drawerOpen = false; shareCurrentSessionLogs() },
                     onStop = { drawerOpen = false; SessionService.stop(this@SessionActivity); finish() },
@@ -1407,6 +1439,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
     private fun readPrefs() {
         pipAutoEnter = SessionPrefs.pipAutoEnter(this)
         unfoldedControls = SessionPrefs.unfoldedControls(this)
+        unfoldedControlsWithController = SessionPrefs.unfoldedControlsWithController(this)
         picturePosition = SessionPrefs.picturePosition(this)
         hudOn = SessionPrefs.hudEnabled(this)
         hudFps = SessionPrefs.hudShowFps(this)
@@ -1600,7 +1633,10 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
         val turnip = TurnipDriver(this)
         com.droiddeck.launcher.gpu.DriverSetupLog.write(this, "surface.driver-setup")
-        if (!CompositorHost.isStarted) CompositorHost.displayChoice = SessionPrefs.androidDriver(this)
+        if (!CompositorHost.isStarted) {
+            CompositorHost.displayChoice = SessionPrefs.androidDriver(this)
+            com.droiddeck.launcher.gpu.AutoDriverTrial.displayStarting(this, SessionPrefs.androidDriver(this))
+        }
         val driverId = if (CompositorHost.isStarted) null else turnip.install()
 
         val previous = SessionState.outputSize
@@ -1675,7 +1711,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
                 intent.getStringExtra(SessionService.EXTRA_STEAM_UI),
                 intent.getStringExtra(SessionService.EXTRA_STEAM_URL),
                 intent.getStringArrayExtra(SessionService.EXTRA_PROGRAM_ARGS),
-                shownOnDisplayId,
+                sessionActivityDisplayId,
             )
         }
         applyFrameGen()
@@ -1726,7 +1762,9 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
         super.onConfigurationChanged(newConfig)
-        if (started) SessionService.setActivityDisplay(this, shownOnDisplayId)
+        if (refreshActivityDisplayId() && started) {
+            SessionService.setActivityDisplay(this, sessionActivityDisplayId)
+        }
         cancelTouchGestures()
         applyFollowOrientation(newConfig)
         applyUnfoldedControls()
@@ -2009,7 +2047,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         if (drawerOpen) {
             if (fromController && (event.keyCode == KeyEvent.KEYCODE_BUTTON_L1 || event.keyCode == KeyEvent.KEYCODE_BUTTON_R1)) {
                 if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
-                    drawerPage = sessionDrawerPages(SessionState.mode == SessionService.MODE_STEAM && secondScreenDisplays.isNotEmpty(), glasses.present)
+                    drawerPage = sessionDrawerPages(secondScreenDisplays.isNotEmpty(), glasses.present)
                         .step(drawerPage, if (event.keyCode == KeyEvent.KEYCODE_BUTTON_R1) 1 else -1)
                     releaseDrawerDirection()
                 }
@@ -2408,7 +2446,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         var presentation = secondScreenPresentation
         if (presentation?.display?.displayId != target.displayId) {
             presentation?.closeControls()
-            presentation = SecondScreenWindow(
+            presentation = SecondScreenPresentation(
                 this, target,
                 sendPointer = ::moveSecondScreenPointer,
                 sendButton = { button, pressed ->
@@ -2453,6 +2491,12 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         applyUnfoldedControls()
     }
 
+    private fun chooseUnfoldedControlsWithController(on: Boolean) {
+        SessionPrefs.setUnfoldedControlsWithController(this, on)
+        unfoldedControlsWithController = on
+        applyUnfoldedControls()
+    }
+
     private fun refreshControls() {
         applyUnfoldedControls()
         updateOnScreenControls()
@@ -2462,11 +2506,17 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         if (!::sessionRoot.isInitialized) return
         val width = sessionRoot.width
         val height = sessionRoot.height
-        val wanted = unfoldedControls && com.droiddeck.launcher.session.SessionDisplay.foldable(this) &&
-            !PadBridge.anyControllerConnected() && !SteamControllerBle.connected &&
-            SessionState.mode == SessionService.MODE_STEAM && SessionState.deckPad &&
-            !pipUi && !isInPictureInPictureMode && width > 0 && height > 0 &&
-            resources.configuration.smallestScreenWidthDp >= com.droiddeck.launcher.session.SessionDisplay.UNFOLDED_MIN_DP
+        val wanted = com.droiddeck.launcher.session.SessionDisplay.unfoldedControlsWanted(
+            enabled = unfoldedControls,
+            foldable = com.droiddeck.launcher.session.SessionDisplay.foldable(this),
+            controllerConnected = PadBridge.anyControllerConnected() || SteamControllerBle.connected,
+            keepWithController = unfoldedControlsWithController,
+            steamDeckPad = SessionState.mode == SessionService.MODE_STEAM && SessionState.deckPad,
+            pip = pipUi || isInPictureInPictureMode,
+            width = width,
+            height = height,
+            smallestWidthDp = resources.configuration.smallestScreenWidthDp,
+        )
         val gameHeight = if (wanted) com.droiddeck.launcher.session.SessionDisplay.unfoldedGameHeight(width, height)
             else FrameLayout.LayoutParams.MATCH_PARENT
         val params = surfaceView.layoutParams as FrameLayout.LayoutParams
@@ -2885,11 +2935,12 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         super.onStart()
         if (runtimeRemovalBlocked) return
         started = true
+        refreshActivityDisplayId()
         displayManager.registerDisplayListener(displayListener, Handler(Looper.getMainLooper()))
         refreshSecondScreenDisplays()
         if (secondScreenMode != SecondScreenMode.NONE && secondScreenPresentation == null) showSecondScreen(secondScreenMode)
         startedScreens++
-        SessionService.setActivityVisible(this, true, shownOnDisplayId)
+        SessionService.setActivityVisible(this, true, sessionActivityDisplayId)
         Glasses.rescan()
         updateGlassesScreen()
         updateHandCamera()
@@ -2903,7 +2954,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         closeSecondScreen(reset = false)
         startedScreens = (startedScreens - 1).coerceAtLeast(0)
         updateGlassesScreen()
-        if (startedScreens == 0) SessionService.setActivityVisible(this, false)
+        if (startedScreens == 0) SessionService.setActivityVisible(this, false, sessionActivityDisplayId)
         super.onStop()
     }
 
@@ -2934,6 +2985,9 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
     override fun onResume() {
         super.onResume()
+        if (refreshActivityDisplayId() && started) {
+            SessionService.setActivityDisplay(this, sessionActivityDisplayId)
+        }
         applyFollowOrientation(resources.configuration)
         if (runtimeRemovalBlocked) return
         com.droiddeck.launcher.ui.Motion.refresh(this)
@@ -3415,7 +3469,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
     private fun finishFlooded() {
         if (isFinishing) return
-        val signal = com.droiddeck.launcher.ui.Themes.byId(SessionPrefs.theme(this)).signal
+        val signal = com.droiddeck.launcher.ui.Themes.current(this).signal
         com.droiddeck.launcher.ui.QuitFlood.mark(signal.toArgb())
         window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(signal.toArgb()))
         quitFlooded = true
@@ -3446,7 +3500,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
     private fun completeLeave() {
         if (isFinishing) return
-        val signal = com.droiddeck.launcher.ui.Themes.byId(SessionPrefs.theme(this)).signal
+        val signal = com.droiddeck.launcher.ui.Themes.current(this).signal
         com.droiddeck.launcher.ui.QuitFlood.mark(signal.toArgb())
         window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(signal.toArgb()))
         quitFlooded = true

@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">Το Αυτόματο θέτει σε παύση και συνεχίζει όταν εμφανίζεται. Το Εγγενής προετοιμάζει πρώτα το Steam για αδρανοποίηση. Το Μη αυτόματο περιμένει το Συνέχιση. Το Ποτέ συνεχίζει να εκτελείται.</string>
     <string name="mode_background_downloads">Διατήρηση των λήψεων σε εξέλιξη</string>
     <string name="mode_background_downloads_hint">Καθυστερεί την αναστολή παρασκηνίου όσο το Steam κάνει ενεργά λήψη.</string>
-    <string name="mode_zram">Συμπίεση zRAM</string>
-    <string name="mode_zram_hint">Όσο τρέχει ένα παιχνίδι, η μνήμη του Steam συμπιέζεται στο zram της συσκευής, ώστε το παιχνίδι να έχει περισσότερη RAM. Ισχύει την επόμενη φορά που θα ξεκινήσει το Steam.</string>
-    <string name="mode_zram_unsupported">Μη διαθέσιμο: η συσκευή δεν έχει zram ή swap, ή ο πυρήνας είναι παλαιότερος από 5.4.</string>
     <string name="mode_suspend_note">Το Αυτόματο θέτει σε παύση στο παρασκήνιο και συνεχίζει όταν εμφανίζεται. Το Μη αυτόματο περιμένει το Συνέχιση. Το Ποτέ συνεχίζει να εκτελείται.</string>
     <string name="mode_startup">Εκκίνηση</string>
     <string name="mode_steam_startup">Εκκίνηση του Steam με το DroidDeck</string>
@@ -504,7 +501,9 @@
     <string name="comp_delete_original_title">Διαγραφή αυτού του πρωτοτύπου;</string>
     <string name="comp_delete_original_body">Αυτό το πρωτότυπο %1$s είναι από προηγούμενο build του %2$s. Το πρωτότυπο του τρέχοντος build διατηρείται πάντα.</string>
     <string name="comp_nightlies_count">Στα Nightlies · %1$d</string>
-    <string name="comp_refresh_to_list">Ανανεώστε για να εμφανιστούν τα πακέτα στα Nightlies.</string>
+    <string name="comp_channel_stable">Σταθερή</string>
+    <string name="comp_channel_nightly">Νυχτερινή</string>
+    <string name="comp_refresh_to_list">Ανανεώστε για να εμφανιστούν τα πακέτα στα Nightlies και στο DroidDeck.</string>
     <string name="comp_nothing_new">Τίποτα νέο από τον τελευταίο έλεγχο.</string>
     <string name="comp_import_wcp">Εισαγωγή .wcp</string>
     <string name="comp_restore_original">Επαναφορά του πρωτοτύπου αυτού του Proton</string>
@@ -1402,6 +1401,14 @@
     <string name="theme_icon_blue_detail">Μαύρο φόντο, λευκά γράμματα, το μπλε για ό,τι είναι επιλεγμένο, εστιασμένο ή πατημένο.</string>
     <string name="theme_electric">Ηλεκτρικό ναυτικό μπλε</string>
     <string name="theme_electric_detail">Το μπλε πιο έντονο, σε επιφάνειες που τείνουν προς το ναυτικό μπλε αντί για γκρι.</string>
+    <string name="theme_gradient">Διαβάθμιση</string>
+    <string name="theme_gradient_detail">Δικά σας πρωτεύον και δευτερεύον χρώμα, σε μίξη στα κουμπιά και τις επισημάνσεις.</string>
+    <string name="theme_gradient_primary">Πρωτεύον</string>
+    <string name="theme_gradient_secondary">Δευτερεύον</string>
+    <string name="theme_color_hue">Απόχρωση</string>
+    <string name="theme_color_saturation">Κορεσμός</string>
+    <string name="theme_color_brightness">Φωτεινότητα</string>
+    <string name="theme_color_hex">Χρώμα hex</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1780,7 +1787,8 @@
     <string name="cmgr_original_kept">Το αρχικό της εγκατεστημένης έκδοσης διατηρείται: είναι ο δρόμος της επιστροφής.</string>
     <string name="cmgr_not_stored">Δεν είναι αποθηκευμένο</string>
     <string name="cmgr_deleted_original">Διαγράφηκε το αρχικό %1$s του %2$s.</string>
-    <string name="cmgr_nightlies_only">Οι λήψεις προέρχονται μόνο από τις κυκλοφορίες Nightlies</string>
+    <string name="cmgr_nightlies_only">Οι λήψεις προέρχονται μόνο από τις κυκλοφορίες Nightlies και DroidDeck</string>
+    <string name="cmgr_nightly_replaced">Η λήψη απέτυχε: αυτή η νυχτερινή έκδοση ίσως αντικαταστάθηκε από νεότερη. Ανανεώστε τη λίστα και δοκιμάστε ξανά.</string>
     <string name="cmgr_list_predates_checksums">Αυτή η λίστα πακέτων προηγείται των αθροισμάτων ελέγχου - ανανεώστε την και δοκιμάστε ξανά</string>
     <string name="cmgr_checksum_mismatch">Αναντιστοιχία αθροίσματος ελέγχου</string>
 
@@ -2496,6 +2504,7 @@
     <string name="glasses_xreal_network_missing">Αναμονή για τη σύνδεση USB Ethernet των γυαλιών. Αυτό το τηλέφωνο ίσως δεν τη διαθέτει στις εφαρμογές.</string>
     <string name="glasses_xreal_connection_failed">Η σύνδεση XREAL διακόπηκε ή επέστρεψε μη υποστηριζόμενη απόκριση. Νέα προσπάθεια…</string>
     <string name="glasses_xreal_experimental">Πειραματική υποστήριξη για 1S. Χρησιμοποιήστε τη λειτουργία Follow και απενεργοποιήστε τη σταθεροποίηση στο μενού των γυαλιών. Οι κατευθύνσεις παρακολούθησης και οι λειτουργίες οθόνης χρειάζονται ακόμα δοκιμή σε συσκευή.</string>
+    <string name="glasses_pro2_experimental">Πειραματική παρακολούθηση κεφαλής για Pro 2. Η ρύθμιση της φωτεινότητας και της έντασης ήχου και η αλλαγή λειτουργίας οθόνης δεν υποστηρίζονται ακόμη.</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Λειτουργία Cardboard</string>
     <string name="cardboard_mode_hint">Εικόνες για το αριστερό και το δεξί μάτι, για γυαλιά VR κινητού.</string>

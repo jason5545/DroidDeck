@@ -292,9 +292,6 @@
     <string name="mode_suspend_steam_note">Auto pauses and resumes when shown. Native prepares Steam for sleep first. Manual waits for Resume. Never keeps running.</string>
     <string name="mode_background_downloads">Keep downloads running</string>
     <string name="mode_background_downloads_hint">Delay background suspension while Steam is actively downloading.</string>
-    <string name="mode_zram">zRAM compression</string>
-    <string name="mode_zram_hint">While a game runs, the Steam client\'s memory is compressed into the device\'s zram, leaving more RAM for the game. Applies the next time Steam starts.</string>
-    <string name="mode_zram_unsupported">Unavailable: this device has no zram or swap, or its kernel is older than 5.4.</string>
     <string name="mode_suspend_note">Auto pauses in the background and resumes when shown. Manual waits for Resume. Never keeps running.</string>
     <string name="mode_startup">Startup</string>
     <string name="mode_steam_startup">Start Steam with DroidDeck</string>
@@ -321,6 +318,8 @@
     <string name="mode_client">Client</string>
     <string name="mode_mangoapp">Performance overlay</string>
     <string name="mode_mangoapp_hint">Turn off if games crash or go black in Deck mode. Applies next session.</string>
+    <string name="mode_return_after_game">Return to DroidDeck after a game</string>
+    <string name="mode_return_after_game_hint">When a game you started from DroidDeck or another launcher closes, Steam exits cleanly (cloud saves finish first) and you go back there. Off: stay in Steam.</string>
     <string name="mode_steam_repair">Repair Steam client</string>
     <string name="mode_steam_repair_hint">Downloads the Steam client again the next time Steam starts. Use it if Steam stays on its loading screen. Games, sign-in and settings are kept.</string>
     <string name="mode_steam_repair_queued">The Steam client will be downloaded again the next time Steam starts.</string>
@@ -515,7 +514,9 @@
     <string name="comp_delete_original_title">Delete this original?</string>
     <string name="comp_delete_original_body">This %1$s original is from an earlier build of %2$s. The current build\'s original is always kept.</string>
     <string name="comp_nightlies_count">On the Nightlies · %1$d</string>
-    <string name="comp_refresh_to_list">Refresh to list packages on the Nightlies.</string>
+    <string name="comp_channel_stable">Stable</string>
+    <string name="comp_channel_nightly">Nightly</string>
+    <string name="comp_refresh_to_list">Refresh to list packages on the Nightlies and DroidDeck releases.</string>
     <string name="comp_nothing_new">Nothing new since the last check.</string>
     <string name="comp_import_wcp">Import .wcp</string>
     <string name="comp_restore_original">Restore this Proton\'s original</string>
@@ -1206,6 +1207,8 @@
     <string name="pip_auto">Automatically enter PiP</string>
     <string name="unfolded_controls">Controls on the unfolded screen</string>
     <string name="unfolded_controls_hint">Unfolded, the game sits above the Steam Deck trackpads and back grips. Folded, the game is full screen.</string>
+    <string name="unfolded_controls_with_controller">Keep them with a controller</string>
+    <string name="unfolded_controls_with_controller_hint">Also show the unfolded controls while a controller is connected, for controllers that hold the phone.</string>
     <string name="pip_suspended">Suspended</string>
     <string name="pip_not_ready">Picture in picture is available once the session is ready.</string>
     <string name="pip_permission">Allow picture in picture for DroidDeck in Android settings.</string>
@@ -1455,6 +1458,14 @@
     <string name="theme_icon_blue_detail">Black ground, white type, the blue for everything selected, focused or pressed.</string>
     <string name="theme_electric">Electric navy</string>
     <string name="theme_electric_detail">The blue brighter, on surfaces that lean navy instead of grey.</string>
+    <string name="theme_gradient">Gradient</string>
+    <string name="theme_gradient_detail">Your own primary and secondary colors, blended on buttons and highlights.</string>
+    <string name="theme_gradient_primary">Primary</string>
+    <string name="theme_gradient_secondary">Secondary</string>
+    <string name="theme_color_hue">Hue</string>
+    <string name="theme_color_saturation">Saturation</string>
+    <string name="theme_color_brightness">Brightness</string>
+    <string name="theme_color_hex">Hex color</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1844,7 +1855,8 @@
     <string name="cmgr_original_kept">The installed build\'s original is kept: it is the way back.</string>
     <string name="cmgr_not_stored">Not stored</string>
     <string name="cmgr_deleted_original">Deleted the %1$s original of %2$s.</string>
-    <string name="cmgr_nightlies_only">Downloads come only from the Nightlies releases</string>
+    <string name="cmgr_nightlies_only">Downloads come only from the Nightlies and DroidDeck releases</string>
+    <string name="cmgr_nightly_replaced">Download failed: this nightly may have been replaced by a newer build. Refresh the list and try again.</string>
     <string name="cmgr_list_predates_checksums">This package list predates checksums - refresh it and try again</string>
     <string name="cmgr_checksum_mismatch">Checksum mismatch</string>
 
@@ -1881,6 +1893,7 @@
     <string name="gpuinfo_not_adreno">Not an Adreno GPU</string>
     <string name="gpuinfo_supported">Supported</string>
     <string name="gpuinfo_experimental">Experimental: its drivers are test builds</string>
+    <string name="gpuinfo_a850_experimental">Experimental Adreno 850 support: requires compatible experimental display and game drivers; not verified on this device</string>
     <string name="gpuinfo_below_tested">Below tested hardware (Adreno 725 and newer): it may not run</string>
     <string name="gpuinfo_unsupported">Not supported: DroidDeck needs an Adreno (Snapdragon) GPU</string>
 
@@ -2193,6 +2206,9 @@
     <string name="stores_download_manager">Download manager</string>
     <string name="stores_parallel">Downloads at a time</string>
     <string name="stores_install_where">Install to</string>
+    <string name="stores_install_language">Game language</string>
+    <string name="stores_install_language_hint">GOG and Epic install this language. System follows the app language.</string>
+    <string name="stores_install_language_system">System</string>
     <string name="stores_install_title">Install %1$s:</string>
     <string name="stores_target_internal">Internal</string>
     <string name="stores_target_free">%1$s free</string>
@@ -2622,6 +2638,7 @@
     <string name="glasses_xreal_network_missing">Waiting for the glasses’ USB Ethernet connection. This phone may not expose it to apps.</string>
     <string name="glasses_xreal_connection_failed">The XREAL connection was interrupted or returned an unsupported response. Retrying…</string>
     <string name="glasses_xreal_experimental">Experimental 1S support. Use Follow mode and disable stabilization in the glasses menu. Tracking directions and display modes still need device testing.</string>
+    <string name="glasses_pro2_experimental">Experimental Pro 2 head tracking. Brightness, volume, and display switching are not supported yet.</string>
     <string name="display_picture_position">Picture position</string>
     <string name="display_position_top">Top</string>
     <string name="display_position_bottom">Bottom</string>

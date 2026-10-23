@@ -503,7 +503,9 @@
     <string name="comp_delete_original_title">Eliminar este original?</string>
     <string name="comp_delete_original_body">Este original de %1$s é de uma versão anterior de %2$s. O original da versão atual é sempre mantido.</string>
     <string name="comp_nightlies_count">Nas Nightlies · %1$d</string>
-    <string name="comp_refresh_to_list">Atualize para listar os pacotes nas Nightlies.</string>
+    <string name="comp_channel_stable">Estável</string>
+    <string name="comp_channel_nightly">Nightly</string>
+    <string name="comp_refresh_to_list">Atualize para listar os pacotes nas Nightlies e no DroidDeck.</string>
     <string name="comp_nothing_new">Nada de novo desde a última verificação.</string>
     <string name="comp_import_wcp">Importar .wcp</string>
     <string name="comp_restore_original">Restaurar o original deste Proton</string>
@@ -1405,6 +1407,14 @@
     <string name="theme_icon_blue_detail">Fundo preto, texto branco e o azul para tudo o que está selecionado, focado ou premido.</string>
     <string name="theme_electric">Azul-marinho elétrico</string>
     <string name="theme_electric_detail">O azul mais vivo, em superfícies que tendem para o azul-marinho em vez do cinzento.</string>
+    <string name="theme_gradient">Gradiente</string>
+    <string name="theme_gradient_detail">As suas próprias cores primária e secundária, combinadas nos botões e destaques.</string>
+    <string name="theme_gradient_primary">Primária</string>
+    <string name="theme_gradient_secondary">Secundária</string>
+    <string name="theme_color_hue">Matiz</string>
+    <string name="theme_color_saturation">Saturação</string>
+    <string name="theme_color_brightness">Brilho</string>
+    <string name="theme_color_hex">Cor hexadecimal</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1790,7 +1800,8 @@
     <string name="cmgr_original_kept">O original da versão instalada é mantido: é o caminho de volta.</string>
     <string name="cmgr_not_stored">Não guardado</string>
     <string name="cmgr_deleted_original">Original de %1$s de %2$s eliminado.</string>
-    <string name="cmgr_nightlies_only">As transferências vêm apenas das versões Nightlies</string>
+    <string name="cmgr_nightlies_only">As transferências vêm apenas das versões Nightlies e DroidDeck</string>
+    <string name="cmgr_nightly_replaced">A transferência falhou: esta versão nightly pode ter sido substituída por uma mais recente. Atualize a lista e tente novamente.</string>
     <string name="cmgr_list_predates_checksums">Esta lista de pacotes é anterior às somas de verificação - atualize-a e tente novamente</string>
     <string name="cmgr_checksum_mismatch">A soma de verificação não corresponde</string>
 
@@ -2507,6 +2518,7 @@
     <string name="glasses_xreal_network_missing">A aguardar a ligação Ethernet por USB dos óculos. Este telemóvel pode não a disponibilizar às apps.</string>
     <string name="glasses_xreal_connection_failed">A ligação aos óculos XREAL foi interrompida ou devolveu uma resposta não suportada. A tentar novamente…</string>
     <string name="glasses_xreal_experimental">Suporte experimental para os 1S. Utilize o modo Follow e desative a estabilização no menu dos óculos. As direções de seguimento e os modos de ecrã ainda têm de ser testados no dispositivo.</string>
+    <string name="glasses_pro2_experimental">Seguimento experimental dos movimentos da cabeça para Pro 2. O ajuste do brilho e do volume e a mudança do modo de ecrã ainda não são suportados.</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Modo Cardboard</string>
     <string name="cardboard_mode_hint">Imagens para o olho esquerdo e o direito, para uns óculos de RV para telemóvel.</string>
@@ -2550,9 +2562,6 @@
     <string name="setup_reset_settings_button">Repor</string>
     <string name="setup_reset_settings_profiles">Repor também os perfis de jogo (Proton, FEX, componentes e ambiente de cada jogo e o ambiente do perfil Padrão)</string>
     <string name="setup_reset_settings_session_running">Termine a sessão antes de repor as definições.</string>
-    <string name="mode_zram">Compressão zRAM</string>
-    <string name="mode_zram_unsupported">Indisponível: este dispositivo não tem swap ativo ou o kernel é anterior à versão 5.4.</string>
-    <string name="mode_zram_hint">Enquanto um jogo está a correr, a memória do cliente Steam é comprimida na zram do dispositivo, deixando mais RAM para o jogo. Aplica-se a partir da próxima vez que o Steam iniciar.</string>
     <string name="stores_storage_low">Espaço insuficiente (%1$s livres, são necessários %2$s)</string>
     <string name="stores_storage_insufficient">Espaço livre insuficiente: são necessários %1$s, só há %2$s livres</string>
     <string name="stores_target_free_unknown">Espaço livre desconhecido</string>

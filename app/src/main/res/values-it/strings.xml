@@ -503,7 +503,9 @@
     <string name="comp_delete_original_title">Eliminare questo originale?</string>
     <string name="comp_delete_original_body">Questo originale di %1$s proviene da una build precedente di %2$s. L\'originale della build attuale viene sempre conservato.</string>
     <string name="comp_nightlies_count">Nelle Nightlies · %1$d</string>
-    <string name="comp_refresh_to_list">Aggiorna per elencare i pacchetti nelle Nightlies.</string>
+    <string name="comp_channel_stable">Stabile</string>
+    <string name="comp_channel_nightly">Nightly</string>
+    <string name="comp_refresh_to_list">Aggiorna per elencare i pacchetti nelle Nightlies e in DroidDeck.</string>
     <string name="comp_nothing_new">Niente di nuovo dall\'ultimo controllo.</string>
     <string name="comp_import_wcp">Importa .wcp</string>
     <string name="comp_restore_original">Ripristina l\'originale di questo Proton</string>
@@ -1405,6 +1407,14 @@
     <string name="theme_icon_blue_detail">Fondo nero, testo bianco, il blu per tutto ciò che è selezionato, attivo o premuto.</string>
     <string name="theme_electric">Blu elettrico</string>
     <string name="theme_electric_detail">Il blu più brillante, su superfici che tendono al blu navy invece che al grigio.</string>
+    <string name="theme_gradient">Gradiente</string>
+    <string name="theme_gradient_detail">I tuoi colori primario e secondario, sfumati su pulsanti ed evidenziazioni.</string>
+    <string name="theme_gradient_primary">Primario</string>
+    <string name="theme_gradient_secondary">Secondario</string>
+    <string name="theme_color_hue">Tonalità</string>
+    <string name="theme_color_saturation">Saturazione</string>
+    <string name="theme_color_brightness">Luminosità</string>
+    <string name="theme_color_hex">Colore esadecimale</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Canc</string>
@@ -1790,7 +1800,8 @@
     <string name="cmgr_original_kept">L\'originale della build installata viene conservato: serve per tornare indietro.</string>
     <string name="cmgr_not_stored">Non salvato</string>
     <string name="cmgr_deleted_original">Originale %1$s di %2$s eliminato.</string>
-    <string name="cmgr_nightlies_only">I download provengono solo dalle release Nightly</string>
+    <string name="cmgr_nightlies_only">I download provengono solo dalle release Nightly e DroidDeck</string>
+    <string name="cmgr_nightly_replaced">Download non riuscito: questa build nightly potrebbe essere stata sostituita da una più recente. Aggiorna l’elenco e riprova.</string>
     <string name="cmgr_list_predates_checksums">Questo elenco di pacchetti è anteriore ai checksum - aggiornalo e riprova</string>
     <string name="cmgr_checksum_mismatch">Checksum non corrispondente</string>
 
@@ -2507,6 +2518,7 @@
     <string name="glasses_xreal_network_missing">In attesa della connessione USB Ethernet degli occhiali. Questo telefono potrebbe non renderla disponibile alle app.</string>
     <string name="glasses_xreal_connection_failed">La connessione XREAL si è interrotta o ha restituito una risposta non supportata. Nuovo tentativo…</string>
     <string name="glasses_xreal_experimental">Supporto sperimentale per 1S. Usa la modalità Follow e disattiva la stabilizzazione nel menu degli occhiali. Direzioni del tracciamento e modalità di visualizzazione devono ancora essere testate sul dispositivo.</string>
+    <string name="glasses_pro2_experimental">Tracciamento sperimentale della testa per Pro 2. La regolazione di luminosità e volume e il cambio della modalità di visualizzazione non sono ancora supportati.</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Modalità Cardboard</string>
     <string name="cardboard_mode_hint">Immagini per l\'occhio sinistro e destro, per un visore VR per telefono.</string>
@@ -2542,9 +2554,6 @@
     <string name="stores_hltb_completionist">Completista</string>
     <string name="stores_hltb_hours">%1$s h</string>
     <string name="stores_hltb_minutes">%1$d min</string>
-    <string name="mode_zram">Compressione zRAM</string>
-    <string name="mode_zram_hint">Mentre un gioco è in esecuzione, la memoria del client Steam viene compressa nella zram del dispositivo, lasciando più RAM al gioco. Si applica al prossimo avvio di Steam.</string>
-    <string name="mode_zram_unsupported">Non disponibile: questo dispositivo non ha zram o swap, oppure il suo kernel è precedente alla 5.4.</string>
     <string name="setup_reset_settings">Ripristina tutte le impostazioni</string>
     <string name="setup_reset_settings_title">Ripristinare tutte le impostazioni?</string>
     <string name="setup_reset_settings_body">Le impostazioni di schermo, prestazioni, controller, tema, lingua e launcher tornano ai valori predefiniti. Giochi, accesso a Steam, account degli store, driver scaricati e cartelle di archiviazione vengono mantenuti.</string>

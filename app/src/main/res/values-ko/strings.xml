@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">자동: 일시 중지되고 다시 표시되면 재개됩니다. 네이티브: 먼저 Steam을 절전에 대비시킵니다. 수동: \"재개\"를 탭할 때까지 기다립니다. 안 함: 계속 실행됩니다.</string>
     <string name="mode_background_downloads">다운로드 계속 진행</string>
     <string name="mode_background_downloads_hint">Steam이 다운로드 중일 때는 백그라운드 일시 중지를 미룹니다.</string>
-    <string name="mode_zram">zRAM 압축</string>
-    <string name="mode_zram_hint">게임을 실행하는 동안 Steam 클라이언트의 메모리가 기기의 zram으로 압축되어 게임에 더 많은 메모리가 남습니다. 다음에 Steam을 시작할 때 적용됩니다.</string>
-    <string name="mode_zram_unsupported">사용할 수 없음: 이 기기에 zram 또는 swap이 없거나 커널이 5.4 미만입니다.</string>
     <string name="mode_suspend_note">자동: 백그라운드에서 일시 중지되고 다시 표시되면 재개됩니다. 수동: \"재개\"를 탭할 때까지 기다립니다. 안 함: 계속 실행됩니다.</string>
     <string name="mode_startup">시작</string>
     <string name="mode_steam_startup">DroidDeck을 열 때 Steam 시작</string>
@@ -310,6 +307,8 @@
     <string name="mode_client">클라이언트</string>
     <string name="mode_mangoapp">성능 오버레이</string>
     <string name="mode_mangoapp_hint">Deck 모드에서 게임이 충돌하거나 화면이 검게 변하면 이 옵션을 끄세요. 다음 세션에 적용됩니다.</string>
+    <string name="mode_return_after_game">게임 종료 후 DroidDeck으로 돌아가기</string>
+    <string name="mode_return_after_game_hint">DroidDeck 또는 다른 런처에서 실행한 게임을 닫으면 Steam이 정상적으로 종료되고(클라우드 저장 동기화를 먼저 완료) 실행한 곳으로 돌아갑니다. 끄면 Steam에 머무릅니다.</string>
     <string name="mode_steam_repair">Steam 클라이언트 복구</string>
     <string name="mode_steam_repair_hint">다음에 Steam을 시작할 때 Steam 클라이언트를 다시 다운로드합니다. Steam이 로딩 화면에서 넘어가지 않을 때 사용하세요. 게임, 로그인 정보 및 설정은 유지됩니다.</string>
     <string name="mode_steam_repair_queued">다음에 Steam을 시작할 때 Steam 클라이언트를 다시 다운로드합니다.</string>
@@ -502,7 +501,9 @@
     <string name="comp_delete_original_title">이 원본 버전을 삭제하시겠습니까?</string>
     <string name="comp_delete_original_body">이 %1$s 원본 버전은 %2$s의 이전 빌드에서 가져온 것입니다. 현재 빌드의 원본 버전은 항상 유지됩니다.</string>
     <string name="comp_nightlies_count">Nightlies 내 · %1$d</string>
-    <string name="comp_refresh_to_list">새로 고쳐 Nightlies의 패키지를 나열합니다.</string>
+    <string name="comp_channel_stable">안정판</string>
+    <string name="comp_channel_nightly">나이틀리</string>
+    <string name="comp_refresh_to_list">새로 고쳐 Nightlies 및 DroidDeck의 패키지를 나열합니다.</string>
     <string name="comp_nothing_new">마지막 확인 이후 새로운 내용이 없습니다.</string>
     <string name="comp_import_wcp">.wcp 가져오기</string>
     <string name="comp_restore_original">이 Proton의 원본 파일 복원</string>
@@ -1388,6 +1389,14 @@
     <string name="theme_icon_blue_detail">검은색 배경에 흰색 글자, 선택·포커스·누름 상태에는 파란색을 사용합니다.</string>
     <string name="theme_electric">일렉트릭 네이비</string>
     <string name="theme_electric_detail">회색 대신 네이비 톤의 화면에 더 밝은 파란색을 사용합니다.</string>
+    <string name="theme_gradient">그라데이션</string>
+    <string name="theme_gradient_detail">직접 고른 기본색과 보조색이 버튼과 강조 표시에 섞여 적용됩니다.</string>
+    <string name="theme_gradient_primary">기본색</string>
+    <string name="theme_gradient_secondary">보조색</string>
+    <string name="theme_color_hue">색조</string>
+    <string name="theme_color_saturation">채도</string>
+    <string name="theme_color_brightness">명도</string>
+    <string name="theme_color_hex">16진수 색상</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1759,7 +1768,8 @@
     <string name="cmgr_original_kept">설치된 빌드의 원본은 되돌리기 위해 유지됩니다.</string>
     <string name="cmgr_not_stored">저장되지 않음</string>
     <string name="cmgr_deleted_original">%2$s의 %1$s 원본을 삭제했습니다.</string>
-    <string name="cmgr_nightlies_only">Nightlies 릴리스에서만 다운로드할 수 있습니다</string>
+    <string name="cmgr_nightlies_only">Nightlies 및 DroidDeck 릴리스에서만 다운로드할 수 있습니다</string>
+    <string name="cmgr_nightly_replaced">다운로드 실패: 이 나이틀리 빌드가 더 새로운 빌드로 교체되었을 수 있습니다. 목록을 새로 고친 후 다시 시도하세요.</string>
     <string name="cmgr_list_predates_checksums">이 패키지 목록은 체크섬 도입 이전의 것입니다. 새로 고친 후 다시 시도하세요</string>
     <string name="cmgr_checksum_mismatch">체크섬 불일치</string>
 
@@ -2471,6 +2481,7 @@
     <string name="glasses_xreal_network_missing">안경의 USB Ethernet 연결을 기다리는 중입니다. 이 휴대폰은 앱에 이 연결을 제공하지 않을 수 있습니다.</string>
     <string name="glasses_xreal_connection_failed">XREAL 연결이 중단되었거나 지원되지 않는 응답을 받았습니다. 다시 시도하는 중…</string>
     <string name="glasses_xreal_experimental">1S 지원은 실험 단계입니다. 안경 메뉴에서 Follow 모드를 사용하고 안정화를 끄세요. 트래킹 방향과 디스플레이 모드는 아직 기기에서 테스트가 필요합니다.</string>
+    <string name="glasses_pro2_experimental">Pro 2 헤드 트래킹은 실험 단계입니다. 밝기와 음량 조절 및 디스플레이 모드 전환은 아직 지원되지 않습니다.</string>
     <string name="stores_fact_developer">개발사</string>
     <string name="stores_fact_publisher">배급사</string>
     <string name="stores_fact_released">출시일</string>

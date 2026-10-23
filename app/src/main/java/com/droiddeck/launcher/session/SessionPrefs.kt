@@ -7,7 +7,6 @@ import com.droiddeck.launcher.R
 import com.droiddeck.launcher.core.CpuAllocationDefaults
 import com.droiddeck.launcher.core.GameEnvironment
 import com.droiddeck.launcher.core.TextureFiltering
-import com.droiddeck.launcher.core.ZramSupport
 import com.droiddeck.launcher.gpu.Cardboard
 import com.droiddeck.launcher.gpu.ScreenEffects
 import org.json.JSONObject
@@ -51,9 +50,9 @@ object SessionPrefs {
     )
 
     fun orientation(context: Context): Int =
-        prefs(context).getInt("orientation", ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
+        prefs(context).getInt("orientation", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
             .takeIf { value -> orientationOptions.any { it.first == value } }
-            ?: ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            ?: ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
     fun setOrientation(context: Context, orientation: Int) {
         require(orientationOptions.any { it.first == orientation })
@@ -144,6 +143,13 @@ object SessionPrefs {
 
     fun setStoresInstallTarget(context: Context, path: String) {
         prefs(context).edit().putString("storesInstallTarget", path).apply()
+    }
+
+    /** Empty means follow the app/system language for GOG and Epic installs. */
+    fun storesInstallLanguage(context: Context): String = prefs(context).getString("storesInstallLanguage", "") ?: ""
+
+    fun setStoresInstallLanguage(context: Context, code: String) {
+        prefs(context).edit().putString("storesInstallLanguage", code).apply()
     }
 
     fun gameStoresParallel(context: Context): Int = prefs(context).getInt("gameStoresParallel", 1).coerceIn(1, 3)
@@ -305,6 +311,16 @@ object SessionPrefs {
     fun setPicturePosition(context: Context, position: String) {
         prefs(context).edit().putString("picturePosition",
             position.takeIf { it in listOf("top", "bottom", "center") } ?: "center").apply()
+    }
+
+    /**
+     * After a game launched from the front end (or another launcher's link) closes, the client
+     * exits cleanly and the session returns there, instead of staying in Big Picture.
+     */
+    fun returnAfterGame(context: Context): Boolean = prefs(context).getBoolean("returnAfterGame", true)
+
+    fun setReturnAfterGame(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean("returnAfterGame", on).apply()
     }
 
     fun stretch16x9(context: Context): Boolean = prefs(context).getBoolean("stretch16x9", false)
@@ -761,6 +777,16 @@ object SessionPrefs {
         prefs(context).edit().putString("theme", id).apply()
     }
 
+    /** The custom Gradient theme's primary and secondary colours (ARGB). */
+    fun gradientColors(context: Context): Pair<Int, Int> = prefs(context).let {
+        it.getInt("gradientPrimary", com.droiddeck.launcher.ui.Themes.DEFAULT_PRIMARY) to
+            it.getInt("gradientSecondary", com.droiddeck.launcher.ui.Themes.DEFAULT_SECONDARY)
+    }
+
+    fun setGradientColors(context: Context, primary: Int, secondary: Int) {
+        prefs(context).edit().putInt("gradientPrimary", primary).putInt("gradientSecondary", secondary).apply()
+    }
+
     private fun customResolution(context: Context, mode: String): Pair<Int, Int>? =
         parseResolution(prefs(context).getString("customRes.$mode", null))
 
@@ -981,6 +1007,13 @@ object SessionPrefs {
         prefs(context).edit().putBoolean("unfoldedControls", enabled).apply()
     }
 
+    fun unfoldedControlsWithController(context: Context): Boolean =
+        prefs(context).getBoolean("unfoldedControlsWithController", false)
+
+    fun setUnfoldedControlsWithController(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean("unfoldedControlsWithController", enabled).apply()
+    }
+
     const val SURFACE_STICK = "stick"
     const val SURFACE_TRACKPAD = "trackpad"
 
@@ -1034,15 +1067,6 @@ object SessionPrefs {
                 putString(policyKey, SUSPEND_AUTO)
             }
         }.apply()
-    }
-
-    fun zramCompression(context: Context): Boolean {
-        val prefs = prefs(context)
-        return if (prefs.contains("zramCompression")) prefs.getBoolean("zramCompression", false) else ZramSupport.recommended(context)
-    }
-
-    fun setZramCompression(context: Context, on: Boolean) {
-        prefs(context).edit().putBoolean("zramCompression", on).apply()
     }
 
 

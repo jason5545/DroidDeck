@@ -287,9 +287,6 @@
     <string name="mode_suspend_steam_note">«Авто» призупиняє сеанс і відновлює його, коли додаток знову на екрані. «Нативний» спершу готує Steam до сну. «Вручну» чекає на «Відновити». «Ніколи» — сеанс працює далі.</string>
     <string name="mode_background_downloads">Не переривати завантаження</string>
     <string name="mode_background_downloads_hint">Відкладає призупинення у фоні, поки Steam активно щось завантажує.</string>
-    <string name="mode_zram">Стиснення zRAM</string>
-    <string name="mode_zram_hint">Під час гри пам\'ять клієнта Steam стискається в zram пристрою, тож гра отримує більше RAM. Застосується під час наступного запуску Steam.</string>
-    <string name="mode_zram_unsupported">Недоступно: на пристрої немає zram або swap, чи ядро старіше за 5.4.</string>
     <string name="mode_suspend_note">«Авто» призупиняє сеанс у фоні й відновлює, коли додаток знову на екрані. «Вручну» чекає на «Відновити». «Ніколи» — сеанс працює далі.</string>
     <string name="mode_startup">Запуск</string>
     <string name="mode_steam_startup">Запускати Steam разом із DroidDeck</string>
@@ -508,7 +505,9 @@
     <string name="comp_delete_original_title">Видалити цей оригінал?</string>
     <string name="comp_delete_original_body">Цей оригінал %1$s походить із попередньої збірки %2$s. Оригінал поточної збірки зберігається завжди.</string>
     <string name="comp_nightlies_count">У нічних збірках · %1$d</string>
-    <string name="comp_refresh_to_list">Оновіть, щоб побачити пакети з нічних збірок.</string>
+    <string name="comp_channel_stable">Стабільна</string>
+    <string name="comp_channel_nightly">Нічна</string>
+    <string name="comp_refresh_to_list">Оновіть, щоб побачити пакети з Nightlies і DroidDeck.</string>
     <string name="comp_nothing_new">Нічого нового з часу останньої перевірки.</string>
     <string name="comp_import_wcp">Імпортувати .wcp</string>
     <string name="comp_restore_original">Відновити оригінал цього Proton</string>
@@ -1430,6 +1429,14 @@
     <string name="theme_icon_blue_detail">Чорне тло, білий текст і синій для всього вибраного, у фокусі чи натиснутого.</string>
     <string name="theme_electric">Електричний темно-синій</string>
     <string name="theme_electric_detail">Яскравіший синій на поверхнях із темно-синім відтінком замість сірого.</string>
+    <string name="theme_gradient">Градієнт</string>
+    <string name="theme_gradient_detail">Ваші основний і додатковий кольори, що плавно переходять на кнопках і виділеннях.</string>
+    <string name="theme_gradient_primary">Основний</string>
+    <string name="theme_gradient_secondary">Додатковий</string>
+    <string name="theme_color_hue">Відтінок</string>
+    <string name="theme_color_saturation">Насиченість</string>
+    <string name="theme_color_brightness">Яскравість</string>
+    <string name="theme_color_hex">Колір hex</string>
     <string name="pckb_key_esc">Esc</string>
     <string name="pckb_key_ins">Ins</string>
     <string name="pckb_key_del">Del</string>
@@ -1822,7 +1829,8 @@
     <string name="cmgr_original_kept">Оригінал встановленої збірки збережено: це шлях назад.</string>
     <string name="cmgr_not_stored">Не збережено</string>
     <string name="cmgr_deleted_original">Видалено оригінал %2$s зі збірки %1$s.</string>
-    <string name="cmgr_nightlies_only">Завантаження надходять лише з випусків Nightlies</string>
+    <string name="cmgr_nightlies_only">Завантаження надходять лише з випусків Nightlies і DroidDeck</string>
+    <string name="cmgr_nightly_replaced">Не вдалося завантажити: можливо, цю нічну збірку замінено новішою. Оновіть список і спробуйте ще раз.</string>
     <string name="cmgr_list_predates_checksums">Цей список пакетів створено до появи контрольних сум - оновіть його і спробуйте ще раз</string>
     <string name="cmgr_checksum_mismatch">Контрольна сума не збіглася</string>
 
@@ -2546,6 +2554,7 @@
     <string name="glasses_xreal_network_missing">Очікування з’єднання USB Ethernet від окулярів. Цей телефон може не надавати його додаткам.</string>
     <string name="glasses_xreal_connection_failed">З’єднання з XREAL перервалося або повернуло непідтримувану відповідь. Повторна спроба…</string>
     <string name="glasses_xreal_experimental">Експериментальна підтримка 1S. Увімкніть режим Follow і вимкніть стабілізацію в меню окулярів. Напрямки відстеження й режими відображення ще потрібно перевірити на пристрої.</string>
+    <string name="glasses_pro2_experimental">Експериментальне відстеження рухів голови для Pro 2. Налаштування яскравості й гучності та перемикання режимів відображення ще не підтримуються.</string>
     <string name="cardboard_title">Cardboard VR</string>
     <string name="cardboard_mode">Режим Cardboard</string>
     <string name="cardboard_mode_hint">Зображення для лівого й правого ока для VR-окулярів під телефон.</string>

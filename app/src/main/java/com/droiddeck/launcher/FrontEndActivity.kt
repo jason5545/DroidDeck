@@ -80,7 +80,7 @@ import com.droiddeck.launcher.session.GameStorage
 import com.droiddeck.launcher.input.SecondScreenDisplay
 import com.droiddeck.launcher.input.SecondScreenDisplays
 
-class MainActivity : ComponentActivity() {
+class FrontEndActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: android.content.Context) {
         super.attachBaseContext(newBase)
         com.droiddeck.launcher.core.AppLanguage.applyTo(this, newBase)
@@ -119,6 +119,7 @@ class MainActivity : ComponentActivity() {
     private var showNonAdreno by mutableStateOf<LinuxRuntimeInstaller.Release?>(null)
     private var glThread by mutableStateOf(true)
     private var noGlError by mutableStateOf(true)
+    private var returnAfterGame by mutableStateOf(true)
     private var steamRepairQueued by mutableStateOf(false)
     private var mangoapp by mutableStateOf(true)
     private var steamController by mutableStateOf(SessionPrefs.CONTROLLER_DECK)
@@ -160,7 +161,7 @@ class MainActivity : ComponentActivity() {
     private var directAudio by mutableStateOf(false)
     private var picturePosition by mutableStateOf("center")
     private var stretch16x9 by mutableStateOf(false)
-    private var orientation by mutableStateOf(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
+    private var orientation by mutableStateOf(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
     private var launcherFullscreen by mutableStateOf(true)
     private var downloadSource by mutableStateOf(DownloadSource.MODE_AUTO)
     private var downloadMirror by mutableStateOf("")
@@ -391,8 +392,6 @@ class MainActivity : ComponentActivity() {
     private var touchMode by mutableStateOf(SessionPrefs.TOUCH_AUTO)
     private var suspendPolicy by mutableStateOf(SessionPrefs.SUSPEND_MANUAL)
     private var steamDownloadsInBackground by mutableStateOf(false)
-    private var zramCompression by mutableStateOf(false)
-    private var zramSupported by mutableStateOf<Boolean?>(null)
     private var oscMode by mutableStateOf(SessionPrefs.OSC_AUTO)
     private var backActionsInverted by mutableStateOf(false)
     private var gameStorage by mutableStateOf("")
@@ -698,7 +697,7 @@ class MainActivity : ComponentActivity() {
                     else {
                         switchPoll = null
                         switchingTo = null
-                        android.widget.Toast.makeText(this@MainActivity, R.string.game_link_session_busy, android.widget.Toast.LENGTH_LONG).show()
+                        android.widget.Toast.makeText(this@FrontEndActivity, R.string.game_link_session_busy, android.widget.Toast.LENGTH_LONG).show()
                     }
                     return
                 }
@@ -756,6 +755,7 @@ class MainActivity : ComponentActivity() {
         downloadPrefix = DownloadSource.custom(this)
         DownloadSource.probe()
         animationsEnabled = SessionPrefs.animationsEnabled(this)
+        LauncherIcon.repair(this, intent?.component)
         launcherIcon = LauncherIcon.current(this)
         gameStoresEnabled = SessionPrefs.gameStoresEnabled(this)
         gameStoresSpeedTier = SessionPrefs.gameStoresSpeedTier(this)
@@ -1036,7 +1036,7 @@ class MainActivity : ComponentActivity() {
                         onWirelessAdbPair = { host, port, code, complete ->
                             Thread({
                                 val result = runCatching {
-                                    kotlinx.coroutines.runBlocking { WirelessAdbFix.pair(this@MainActivity, host, port, code) }
+                                    kotlinx.coroutines.runBlocking { WirelessAdbFix.pair(this@FrontEndActivity, host, port, code) }
                                 }
                                 val error = result.exceptionOrNull()?.let { it.localizedMessage ?: getString(R.string.main_wadb_pair_failed) }
                                 ui.post { complete(error) }
@@ -1044,13 +1044,13 @@ class MainActivity : ComponentActivity() {
                         },
                         onFindWirelessAdbPort = { host, complete ->
                             Thread({
-                                val port = WirelessAdbFix.findConnectPort(this@MainActivity, host)
+                                val port = WirelessAdbFix.findConnectPort(this@FrontEndActivity, host)
                                 ui.post { complete(port) }
                             }, "wireless-adb-discovery").start()
                         },
                         onWirelessAdbApply = { host, port, enabled, complete ->
                             Thread({
-                                val result = runCatching { WirelessAdbFix.setChildProcessLimit(this@MainActivity, host, port, enabled) }
+                                val result = runCatching { WirelessAdbFix.setChildProcessLimit(this@FrontEndActivity, host, port, enabled) }
                                 val error = result.exceptionOrNull()?.let { it.localizedMessage ?: getString(R.string.main_wadb_command_failed) }
                                 ui.post {
                                     if (error == null) refreshPhantomStatus()
@@ -1060,7 +1060,7 @@ class MainActivity : ComponentActivity() {
                         },
                         onSetPhantomProcessLimit = { enabled, complete ->
                             Thread({
-                                val result = runCatching { WirelessAdbFix.setUsingSavedPairing(this@MainActivity, enabled) }
+                                val result = runCatching { WirelessAdbFix.setUsingSavedPairing(this@FrontEndActivity, enabled) }
                                 val error = result.exceptionOrNull()?.let { it.localizedMessage ?: getString(R.string.main_wadb_unavailable) }
                                 ui.post {
                                     if (error == null) refreshPhantomStatus()
@@ -1116,7 +1116,7 @@ class MainActivity : ComponentActivity() {
                 showNonAdreno?.let { release ->
                     ConfirmDialog(
                         title = androidx.compose.ui.res.stringResource(R.string.main_non_adreno_title),
-                        text = androidx.compose.ui.res.stringResource(R.string.main_non_adreno_text, com.droiddeck.launcher.core.DeviceSupport.gpuName(this@MainActivity), release.size / 1e6),
+                        text = androidx.compose.ui.res.stringResource(R.string.main_non_adreno_text, com.droiddeck.launcher.core.DeviceSupport.gpuName(this@FrontEndActivity), release.size / 1e6),
                         confirm = androidx.compose.ui.res.stringResource(R.string.main_install_anyway),
                         onConfirm = { showNonAdreno = null; install(release) },
                         onDismiss = { showNonAdreno = null },
@@ -1615,12 +1615,11 @@ class MainActivity : ComponentActivity() {
                 touchMode = touchMode,
                 suspendPolicy = suspendPolicy,
                 steamDownloadsInBackground = steamDownloadsInBackground,
-                zramCompression = if (mode == SessionService.MODE_STEAM) zramCompression else null,
-                zramSupported = zramSupported,
                 pipSupported = com.droiddeck.launcher.session.SessionPipController.supported(this),
                 pipAutoEnter = pipAutoEnter,
                 unfoldedControls = if (mode == SessionService.MODE_STEAM &&
                     com.droiddeck.launcher.session.SessionDisplay.foldable(this)) unfoldedControls else null,
+                unfoldedControlsWithController = unfoldedControlsWithController,
                 oscMode = if (mode == SessionService.MODE_STEAM) oscMode else null,
                 backActionsInverted = backActionsInverted,
                 directAudio = if (mode == SessionService.MODE_STEAM) directAudio else null,
@@ -1634,6 +1633,7 @@ class MainActivity : ComponentActivity() {
                 forceSsbs = forceSsbs,
                 syncBackend = if (mode == SessionService.MODE_STEAM) SessionPrefs.syncBackendOf(fastSync, fsyncFirst, syncFallback) else null,
                 steamClientArch = if (mode == SessionService.MODE_STEAM) steamClientArch else null,
+                returnAfterGame = if (mode == SessionService.MODE_STEAM) returnAfterGame else null,
                 steamRepairQueued = steamRepairQueued,
                 mangoapp = mangoapp,
                 steamController = if (mode == SessionService.MODE_STEAM) steamController else null,
@@ -1683,9 +1683,11 @@ class MainActivity : ComponentActivity() {
                     SessionPrefs.setSteamDownloadsInBackground(this, enabled)
                     steamDownloadsInBackground = enabled
                 },
-                onZramCompression = { on -> SessionPrefs.setZramCompression(this, on); zramCompression = on },
                 onPipAutoEnter = { on -> SessionPrefs.setPipAutoEnter(this, on); pipAutoEnter = on },
                 onUnfoldedControls = { on -> SessionPrefs.setUnfoldedControls(this, on); unfoldedControls = on },
+                onUnfoldedControlsWithController = { on ->
+                    SessionPrefs.setUnfoldedControlsWithController(this, on); unfoldedControlsWithController = on
+                },
                 onOsc = { o -> SessionPrefs.setOscMode(this, o); oscMode = o },
                 onBackActionsInverted = { inverted ->
                     SessionPrefs.setBackActionsInverted(this, inverted)
@@ -1720,6 +1722,7 @@ class MainActivity : ComponentActivity() {
                 onSteamRepair = { steamRepairQueued = SteamRepair.queue(this) },
                 onSteamClientArch = { id -> SessionPrefs.setSteamClientArch(this, id); steamClientArch = id; refresh() },
                 onMangoapp = { on -> SessionPrefs.setMangoapp(this, on); mangoapp = on },
+                onReturnAfterGame = { on -> SessionPrefs.setReturnAfterGame(this, on); returnAfterGame = on },
                 onSteamController = { id -> SessionPrefs.setSteamController(this, id); steamController = id },
                 onRunSteamAtStartup = { on ->
                     SessionPrefs.setRunSteamAtStartup(this, on)
@@ -1873,10 +1876,12 @@ class MainActivity : ComponentActivity() {
 
     private var pipAutoEnter by mutableStateOf(false)
     private var unfoldedControls by mutableStateOf(false)
+    private var unfoldedControlsWithController by mutableStateOf(false)
 
     private fun loadModeSettings(mode: String) {
         pipAutoEnter = SessionPrefs.pipAutoEnter(this)
         unfoldedControls = SessionPrefs.unfoldedControls(this)
+        unfoldedControlsWithController = SessionPrefs.unfoldedControlsWithController(this)
         resolution = SessionPrefs.resolutionChoice(this, mode, com.droiddeck.launcher.session.SessionDisplay.panelSize(this))
         fexPreset = SessionPrefs.fexPreset(this)
         forceSsbs = SessionPrefs.forceSsbs(this)
@@ -1886,6 +1891,7 @@ class MainActivity : ComponentActivity() {
         steamClientArch = SessionPrefs.steamClientArch(this)
         steamRepairQueued = SteamRepair.queued(this)
         mangoapp = SessionPrefs.mangoapp(this)
+        returnAfterGame = SessionPrefs.returnAfterGame(this)
         steamController = SessionPrefs.steamController(this)
         runSteamAtStartup = SessionPrefs.runSteamAtStartup(this)
         loadBootMovie()
@@ -1908,9 +1914,6 @@ class MainActivity : ComponentActivity() {
         storageDiagnostics = SessionPrefs.storageDiagnosticsEnabled(this)
         settingsMode = mode
         Thread({
-            val zram = com.droiddeck.launcher.core.ZramSupport.supported()
-            val zramOn = SessionPrefs.zramCompression(this)
-            ui.post { zramSupported = zram; zramCompression = zramOn }
             drivers.refreshDrivers()
             val storage = GameStorage.options(this)
             val deckyInstalled = if (mode == SessionService.MODE_STEAM) DeckyManager.installed(this) else null
@@ -2027,7 +2030,7 @@ class MainActivity : ComponentActivity() {
                     steamGamesX64 = scannedX64
                     steamGames = all.map { g ->
                         val newer = current[g.appId]
-                        if (newer != null && g.library != Library.ADDED && steamArtRefreshes[g.appId] != artRefreshesAtStart[g.appId]) g.withArt(newer.art, newer.hero, newer.icon) else g
+                        if (newer != null && g.library != Library.ADDED && steamArtRefreshes[g.appId] != artRefreshesAtStart[g.appId]) g.withArt(newer.art, newer.hero, newer.icon, newer.logo) else g
                     }
                     shortcutLibraryScanning = false
                     handleGameLink(all)
