@@ -320,6 +320,8 @@
     <string name="mode_mangoapp_hint">如果遊戲在 Deck 模式下崩潰或黑畫面，請關閉。下次工作階段生效。</string>
     <string name="mode_return_after_game">遊戲結束後回到 DroidDeck</string>
     <string name="mode_return_after_game_hint">從 DroidDeck 或其他啟動器開啟的遊戲關閉時，Steam 會正常結束（先等雲端存檔同步完），再回到原本的地方。關閉時留在 Steam。</string>
+    <string name="mode_shader_precache">著色器預先快取</string>
+    <string name="mode_shader_precache_hint">Steam 會下載替你的遊戲預先建置好的著色器，在背景處理，讓遊戲比較不會卡頓。關閉可以省下數據用量、儲存空間和電量，遊戲改成邊玩邊建置著色器。跟 Steam 的「下載」>「著色器預先快取」是同一個設定。下次工作階段生效。</string>
     <string name="mode_steam_repair">修復 Steam 用戶端</string>
     <string name="mode_steam_repair_hint">下次啟動 Steam 時重新下載用戶端。Steam 一直停在載入畫面時使用。遊戲、登入狀態和設定都會保留。</string>
     <string name="mode_steam_repair_queued">下次啟動 Steam 時會重新下載用戶端。</string>
@@ -552,8 +554,8 @@
     <string name="perf_sysmem">Turnip：sysmem 轉譯</string>
     <string name="perf_sysmem_hint">對 Steam 用戶端比較快；遊戲裡由驅動程式在每個轉譯階段自己選 tile 或系統記憶體轉譯。Adreno 710／720／722 必須開啟。</string>
     <string name="perf_xalia">略過 Steam 的 xalia 輔助程式</string>
-    <string name="perf_fastsync">droiddeck-ntsync（實驗性）</string>
-    <string name="perf_fastsync_hint">在使用者空間代替 Linux 的 ntsync 驅動程式，供測試用。開啟時，Proton 會用它取代 droiddeck-esync 和 droiddeck-fsync。支援 Proton Experimental ARM64、GE-Proton 和 proton-cachyos。下次工作階段生效。</string>
+    <string name="perf_fastsync">droiddeck-ntsync</string>
+    <string name="perf_fastsync_hint">在使用者空間代替 Linux 的 ntsync 驅動程式。開啟時，Proton 會用它取代 droiddeck-esync 和 droiddeck-fsync。支援 Proton Experimental ARM64、GE-Proton 和 proton-cachyos。下次工作階段生效。</string>
     <string name="perf_esync">droiddeck-esync</string>
     <string name="perf_fsync">優先使用 droiddeck-fsync</string>
     <string name="perf_fsync_hint">直接用原版 Proton 檔案跑 Proton 自己的 fsync，futex_waitv 由使用者空間提供，所以不需要套件，Steam 一更新 Proton 也照常運作。開啟時，遊戲會優先用它，其次才是 droiddeck-esync；Proton 本身不讓用 fsync 的少數遊戲除外。下次工作階段生效。</string>
@@ -564,6 +566,8 @@
     <string name="perf_fastpath">proot 快速路徑</string>
     <string name="perf_fastpath_needs_seccomp">需要 proot 的 seccomp 過濾器。</string>
     <string name="perf_fastpath_hint">檔案查找更快、卡頓更少。如果有程式找不到它的檔案，請關閉。</string>
+    <string name="perf_cursor_composite">由 gamescope 繪製游標</string>
+    <string name="perf_cursor_composite_hint">游標由 gamescope 自己畫，不交給 Android。用控制器移動游標時請開啟。在手機上關閉比較快。下次工作階段生效。</string>
     <string name="perf_identity">工作階段識別</string>
     <string name="perf_hostname">主機名稱</string>
     <string name="perf_hostname_hint">Steam 看到的這台裝置名稱。留空會恢復成 %1$s。</string>
@@ -1093,6 +1097,9 @@
     <string name="gpu_hide_other">隱藏其他 GPU 的驅動程式</string>
     <string name="gpu_show_other">顯示其他 GPU 的驅動程式</string>
     <string name="gpu_advanced">進階</string>
+    <string name="gpu_ubwc_title">UBWC 相容性</string>
+    <string name="gpu_ubwc_hint">Steam 或 Android 的畫面出現條紋或閃爍時，試試「開啟」或「關閉」。重新啟動 DroidDeck 後，兩個驅動程式都會套用。</string>
+    <string name="gpu_ubwc_restart">重新啟動 DroidDeck 後生效。</string>
     <string name="gpu_set_with_display">跟顯示驅動程式一起設定：%1$s 同時包含兩者。</string>
     <string name="gpu_set_with_runtime">跟執行環境驅動程式一起設定：%1$s 同時包含兩者。</string>
     <string name="gpu_runtime_hint">遊戲和桌面都會使用。</string>
@@ -1436,6 +1443,10 @@
     <string name="theme_icon_blue_detail">黑色背景、白色文字，選取、聚焦或按下的項目使用藍色。</string>
     <string name="theme_electric">電光藏青</string>
     <string name="theme_electric_detail">更亮的藍色，搭配偏藏青而非灰色的介面。</string>
+    <string name="theme_inner_gamer">Inner Gamer</string>
+    <string name="theme_inner_gamer_detail">顏色在彩虹色之間循環。跟隨 Android 的動畫設定。</string>
+    <string name="theme_rgb_speed">速度</string>
+    <string name="theme_rgb_speed_hint">顏色循環的速度。</string>
     <string name="theme_gradient">漸層</string>
     <string name="theme_gradient_detail">自己選的主色和輔色，以漸層呈現在按鈕和選取的項目上。</string>
     <string name="theme_gradient_primary">主色</string>
@@ -1552,6 +1563,13 @@
     <string name="fm_conflict_skip">略過</string>
     <string name="fm_select_this_folder">選擇這個資料夾</string>
     <string name="fm_back">返回</string>
+    <string name="fm_exit">離開</string>
+    <string name="fm_return_to_start">回到起始資料夾</string>
+    <string name="fm_start_unavailable">起始資料夾已經無法使用</string>
+    <string name="fm_cancel_operation_title">要取消作業嗎？</string>
+    <string name="fm_cancel_operation_confirmation">目前的作業會被取消，確定嗎？</string>
+    <string name="fm_accept">確定</string>
+    <string name="fm_decline">不要</string>
     <string name="fm_drive_not_readable">%1$s 已掛載，但目前無法讀取</string>
     <string name="fm_list_view">清單檢視</string>
     <string name="fm_grid_view">格狀檢視</string>
