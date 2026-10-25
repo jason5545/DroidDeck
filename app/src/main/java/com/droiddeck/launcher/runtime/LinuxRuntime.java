@@ -241,6 +241,7 @@ public final class LinuxRuntime {
                 // Left unbound, as above.
             }
         }
+        syncAndroidCjkFonts(root);
         String[][] procFiles = {
                 {"pci_devices", "/proc/bus/pci/devices"},
                 {"stat", "/proc/stat"},
@@ -271,6 +272,126 @@ public final class LinuxRuntime {
         List<String> specs = new ArrayList<>();
         for (int i = 0; i + 1 < cmd.size(); i += 2) specs.add(cmd.get(i + 1));
         return specs;
+    }
+
+    /** Where the Android CJK fonts are copied inside the rootfs; fontconfig scans /usr/share/fonts. */
+    private static final String ANDROID_FONTS = "usr/share/fonts/droiddeck-android";
+
+    /**
+     * The rootfs has a single font family, DejaVu, so the Steam client drew Chinese, Japanese and
+     * Korean text as boxes. Android ships Noto Sans CJK on nearly every device (an older one has
+     * DroidSansFallback instead); a copy of it in the rootfs is what fontconfig then finds for those
+     * scripts - in the client's web views, on the desktop and in Wine - with nothing downloaded.
+     * A copy rather than a bind, so a system update that replaces the file changes the directory
+     * and fontconfig rescans it. A file is copied again only when its size differs.
+     */
+    private static void syncAndroidCjkFonts(File root) {
+        File fonts = new File(root, "usr/share/fonts");
+        if (!fonts.isDirectory()) return;
+        File[] cjk = new File("/system/fonts").listFiles((dir, name) -> name.startsWith("NotoSansCJK"));
+        if (cjk == null || cjk.length == 0) {
+            cjk = new File("/system/fonts").listFiles((dir, name) -> name.startsWith("DroidSansFallback"));
+        }
+        if (cjk == null || cjk.length == 0) return;
+        File target = new File(root, ANDROID_FONTS);
+        if (!target.isDirectory() && !target.mkdirs()) return;
+        List<String> wanted = new ArrayList<>();
+        for (File source : cjk) {
+            if (!source.isFile() || !source.canRead()) continue;
+            wanted.add(source.getName());
+            File copy = new File(target, source.getName());
+            if (copy.length() == source.length()) continue;
+            File partial = new File(target, source.getName() + ".part");
+            try {
+                Files.copy(source.toPath(), partial.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                Files.move(partial.toPath(), copy.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                android.util.Log.i("LinuxRuntime", "fonts: copied " + source.getName() + " into the rootfs");
+            } catch (IOException e) {
+                //noinspection ResultOfMethodCallIgnored
+                partial.delete();
+                android.util.Log.w("LinuxRuntime", "fonts: could not copy " + source.getName(), e);
+            }
+        }
+        File[] present = target.listFiles();
+        if (present != null) {
+            for (File f : present) {
+                //noinspection ResultOfMethodCallIgnored
+                if (!wanted.contains(f.getName())) f.delete();
+            }
+        }
+        writeCjkFontRules(root, wanted.stream().anyMatch(name -> name.startsWith("NotoSansCJK")));
+    }
+
+    /** The fontconfig rules beside the copied fonts; droiddeck-desktop leaves files with this prefix alone. */
+    private static final String CJK_FONT_RULES = "etc/fonts/conf.d/65-droiddeck-cjk.conf";
+
+    /**
+     * Noto Sans CJK keeps the Simplified, Traditional, Hong Kong, Japanese and Korean faces in one
+     * file, and fontconfig took the Korean one for Chinese text (fc-match :lang=zh-tw gave "Noto
+     * Sans CJK KR"): the default 65-nonlatin.conf names only that face, for Hangul, among the
+     * families it puts in front of sans-serif. Text that names its language gets that language's
+     * face; text that does not - most of Wine's - gets the face for Android's own language. Each
+     * goes in just before the generic family, which this file (65-d...) reaches ahead of
+     * 65-nonlatin, so it is ahead of the Korean face and still behind the Latin defaults; and at
+     * the end as well, for a rootfs whose default rules were never linked (droiddeck-desktop links
+     * them), where nothing else names a CJK face.
+     */
+    private static void writeCjkFontRules(File root, boolean notoCjk) {
+        File rules = new File(root, CJK_FONT_RULES);
+        if (!notoCjk) {
+            //noinspection ResultOfMethodCallIgnored
+            rules.delete();
+            return;
+        }
+        String[][] byLanguage = {
+                {"zh-tw", "TC"}, {"zh-hk", "HK"}, {"zh-mo", "HK"}, {"zh-cn", "SC"}, {"zh-sg", "SC"},
+                {"ja", "JP"}, {"ko", "KR"},
+        };
+        StringBuilder xml = new StringBuilder()
+                .append("<?xml version=\"1.0\"?>\n<!DOCTYPE fontconfig SYSTEM \"urn:fontconfig:fonts.dtd\">\n")
+                .append("<!-- Written by DroidDeck at each session start (LinuxRuntime.writeCjkFontRules). -->\n")
+                .append("<fontconfig>\n");
+        for (String[] rule : byLanguage) {
+            String lang = "    <test name=\"lang\" compare=\"contains\"><string>" + rule[0] + "</string></test>\n";
+            appendCjkFaceRules(xml, lang, rule[1]);
+        }
+        String face = androidCjkFace(java.util.Locale.getDefault());
+        if (face != null) appendCjkFaceRules(xml, "", face);
+        xml.append("</fontconfig>\n");
+        String text = xml.toString();
+        try {
+            if (rules.isFile() && text.equals(new String(Files.readAllBytes(rules.toPath()), StandardCharsets.UTF_8))) return;
+            File dir = rules.getParentFile();
+            if (dir == null || (!dir.isDirectory() && !dir.mkdirs())) return;
+            Files.write(rules.toPath(), text.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            android.util.Log.w("LinuxRuntime", "fonts: could not write " + CJK_FONT_RULES, e);
+        }
+    }
+
+    /** One face, in front of each generic family and at the end, for patterns that pass {@code test}. */
+    private static void appendCjkFaceRules(StringBuilder xml, String test, String face) {
+        for (String generic : new String[] {"sans-serif", "serif", "monospace"}) {
+            xml.append("  <match target=\"pattern\">\n").append(test)
+                    .append("    <test name=\"family\"><string>").append(generic).append("</string></test>\n")
+                    .append("    <edit name=\"family\" mode=\"prepend\"><string>Noto Sans CJK ").append(face).append("</string></edit>\n")
+                    .append("  </match>\n");
+        }
+        xml.append("  <match target=\"pattern\">\n").append(test)
+                .append("    <edit name=\"family\" mode=\"append_last\"><string>Noto Sans CJK ").append(face).append("</string></edit>\n")
+                .append("  </match>\n");
+    }
+
+    /** The Noto Sans CJK face for Android's language, or null for a language that is none of them. */
+    static String androidCjkFace(java.util.Locale locale) {
+        String language = locale.getLanguage();
+        if ("ja".equals(language)) return "JP";
+        if ("ko".equals(language)) return "KR";
+        if (!"zh".equals(language)) return null;
+        String country = locale.getCountry();
+        if ("HK".equals(country) || "MO".equals(country)) return "HK";
+        if ("TW".equals(country) || "Hant".equals(locale.getScript())) return "TC";
+        return "SC";
     }
 
     /**

@@ -171,6 +171,8 @@ class DrawerActions(
     val fexPreset: String,
     /** Steam only: games stretched to the screen's size, changed live (null = not Steam). */
     val fillScreen: Boolean? = null,
+    /** Steam only: a tap still clicks in a game the client turned touch off for, changed live (null = not Steam). */
+    val gameTouch: Boolean? = null,
     val upscaler: Int = 0,
     val upscaleSharpness: Int = 75,
     val secondScreenMode: SecondScreenMode,
@@ -192,6 +194,7 @@ class DrawerActions(
     val onShape: (String) -> Unit,
     val onFexPreset: (String) -> Unit,
     val onFillScreen: (Boolean) -> Unit = {},
+    val onGameTouch: (Boolean) -> Unit = {},
     val onUpscaler: (Int) -> Unit = {},
     val onUpscaleSharpness: (Int) -> Unit = {},
     val onSecondScreenMode: (SecondScreenMode) -> Unit,
@@ -374,6 +377,10 @@ fun SessionDrawer(open: Boolean, page: Int, controllerActive: Boolean, onPageCha
                                 ChoiceRow(host, "touch", stringResource(R.string.mode_touch), null,
                                     listOf(SessionPrefs.TOUCH_AUTO to stringResource(R.string.drawer_touch_auto, a.touchAuto), SessionPrefs.TOUCH_PAD to stringResource(R.string.mode_touch_touchpad), SessionPrefs.TOUCH_DIRECT to stringResource(R.string.mode_touch_direct)),
                                     a.touchMode, chipModifier = focus.track(page, "touch"), onPick = a.onTouch)
+                                if (a.gameTouch != null) ToggleRow(
+                                    host, "game-touch", stringResource(R.string.drawer_game_touch), null, a.gameTouch,
+                                    chipModifier = focus.track(page, "game-touch"), onChange = a.onGameTouch,
+                                )
                                 ChoiceRow(host, "osc", stringResource(R.string.mode_osc), null,
                                     if (a.steam) listOf(SessionPrefs.OSC_AUTO to stringResource(R.string.common_auto), SessionPrefs.OSC_ALWAYS to stringResource(R.string.common_always), SessionPrefs.OSC_STEAM_QAM to stringResource(R.string.mode_osc_qam), SessionPrefs.OSC_NEVER to stringResource(R.string.common_never))
                                     else listOf(SessionPrefs.OSC_AUTO to stringResource(R.string.common_auto), SessionPrefs.OSC_ALWAYS to stringResource(R.string.common_always), SessionPrefs.OSC_NEVER to stringResource(R.string.common_never)),

@@ -268,6 +268,8 @@
     <string name="mode_added_exe_note">Por defecto, el .exe con el nombre de la carpeta o, si no, el más grande.</string>
     <string name="mode_fill">Estirar juegos para llenar la pantalla</string>
     <string name="mode_fill_hint">Mantiene a pantalla completa los juegos que se redimensionan solos. Desactívalo si un juego se ve pequeño. Se aplica en la próxima sesión.</string>
+    <string name="mode_game_touch">Táctil en los juegos</string>
+    <string name="mode_game_touch_hint">Steam desactiva el táctil cuando un juego tiene el foco. Activado: un toque sigue haciendo clic donde cae. Desactivado: decide Steam. Se aplica al instante.</string>
     <string name="mode_stretch169">Estirar juegos 16:9</string>
     <string name="mode_stretch169_hint">En pantallas más cuadradas que 16:9, estira los juegos para llenar en lugar de mostrar barras. Se aplica en la próxima sesión.</string>
     <string name="mode_audio">Audio</string>
@@ -412,6 +414,7 @@
     <string name="drawer_next_page">Página siguiente</string>
     <string name="drawer_hud">HUD de rendimiento</string>
     <string name="drawer_fill">Estirar juegos para llenar</string>
+    <string name="drawer_game_touch">Táctil en los juegos</string>
     <string name="drawer_touch_auto">Auto (%1$s)</string>
     <string name="drawer_keyboard">Teclado</string>
     <string name="drawer_pc_keyboard">Teclado de PC</string>
