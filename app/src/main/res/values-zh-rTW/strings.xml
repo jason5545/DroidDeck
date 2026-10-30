@@ -663,7 +663,6 @@
     <string name="drawer_hud_color_amber">琥珀色</string>
     <string name="drawer_hud_color_violet">紫羅蘭色</string>
     <string name="drawer_hud_opacity">不透明度</string>
-    <string name="hud_matches_steam_overlay">畫格速率、畫格時間和各項讀數，跟 Steam 的效能疊加資訊來自同樣的來源。</string>
     <string name="hud_size">大小</string>
     <string name="hud_size_hint">輕觸 HUD 也可以切換大小。</string>
     <string name="hud_size_full">完整</string>
@@ -672,7 +671,7 @@
     <string name="hud_size_minimal">極簡</string>
     <string name="hud_size_mega">超大</string>
     <string name="hud_locked">鎖定位置</string>
-    <string name="hud_locked_hint">拖曳 HUD 可以移動位置，長按可以鎖定或解鎖。</string>
+    <string name="hud_locked_hint">拖曳 HUD 可以移動位置，長按可以鎖定或解鎖。鎖定時，被 HUD 蓋住的螢幕控制項照樣可以使用。</string>
     <string name="hud_group_look">外觀</string>
     <string name="hud_scale">螢幕上的大小</string>
     <string name="hud_color_soft">柔和</string>
@@ -786,6 +785,8 @@
     <string name="drawer_low_latency_controller_hint">手把以 1000 Hz 回報，而不是 250 Hz。CPU 用量會稍微增加。</string>
     <string name="drawer_low_latency_touch">低延遲觸控</string>
     <string name="drawer_low_latency_touch_hint">觸控不等畫格批次處理；Steam 的觸控控制項以 1000 Hz 回報。CPU 用量會稍微增加。</string>
+    <string name="drawer_evdev_mouse">原始滑鼠通道</string>
+    <string name="drawer_direct_cursor">游標</string>
     <string name="drawer_pc_keyboard">PC 鍵盤</string>
     <string name="drawer_android_keyboard">Android</string>
     <string name="drawer_second_screen">第二螢幕</string>
@@ -921,6 +922,17 @@
     <string name="setup_fullscreen">全螢幕</string>
     <string name="setup_fullscreen_on">隱藏 Android 的狀態列和導覽列</string>
     <string name="setup_fullscreen_off">顯示 Android 的狀態列和導覽列</string>
+    <string name="setup_dual_screen">雙螢幕</string>
+    <string name="setup_dual_screen_hint">自動：有內建第二螢幕的掌機才使用。開啟：任何第二個顯示器都使用。關閉：啟動器和遊戲都留在同一個螢幕，仍然可以從工作階段選單選擇第二螢幕。</string>
+    <string name="setup_dual_screen_auto">自動</string>
+    <string name="setup_dual_screen_on">開啟</string>
+    <string name="setup_dual_screen_off">關閉</string>
+    <string name="setup_dual_screen_menu">下方螢幕選單</string>
+    <string name="setup_dual_screen_menu_hint">把各個區塊和遊戲內選單移到第二螢幕，也在那裡輸入文字，上方螢幕保留完整畫面。用 L2、R2 切換區塊。</string>
+    <string name="setup_dual_screen_controls">遊戲中的下方螢幕控制項</string>
+    <string name="setup_dual_screen_controls_hint">工作階段開始時，在第二螢幕開啟觸控板和鍵盤。</string>
+    <string name="dual_typing_title">輸入到上方螢幕</string>
+    <string name="dual_typing_done">完成</string>
     <string name="setup_default_home">預設主畫面 App</string>
     <string name="setup_choose_home">選擇主畫面 App</string>
     <string name="setup_choose">選擇</string>
@@ -2234,6 +2246,8 @@
     <string name="stores_resume">繼續</string>
     <string name="stores_refresh">重新整理</string>
     <string name="stores_sort">排序</string>
+    <string name="setup_rail_labels">側邊欄標籤</string>
+    <string name="setup_rail_labels_hint">在側邊欄圖示下方顯示名稱。關閉可以讓側邊欄更窄。</string>
     <string name="library_display">顯示</string>
     <string name="library_display_larger">放大卡片</string>
     <string name="library_display_smaller">縮小卡片</string>
@@ -3293,7 +3307,6 @@
     <string name="integration_title">Steam 整合</string>
     <string name="integration_count">已開啟 %1$d／%2$d 項</string>
     <string name="integration_set_up">設定</string>
-    <string name="integration_later">暫時不要</string>
     <string name="integration_location">位置</string>
     <string name="integration_app_info">應用程式資訊</string>
     <string name="integration_wifi">Wi-Fi 名稱</string>
@@ -3313,6 +3326,12 @@
     <string name="integration_shortcuts_service">DroidDeck 主畫面按鈕</string>
     <string name="integration_shortcuts_service_description">Steam 工作階段在前景、而且 DroidDeck 是預設主畫面 App 時，把主畫面按鈕轉給 Steam 鍵。不會讀取螢幕內容。</string>
     <string name="integration_brightness_needed">請到設定 → Steam 整合開啟亮度</string>
+    <string name="desktop_restore_title">正在還原你的軟體</string>
+    <string name="desktop_restore_body">DroidDeck 更新後，正在重新安裝你加入的 App。</string>
+    <string name="desktop_restore_done_title">軟體已還原</string>
+    <string name="desktop_restore_done_body">你加入的 App 已經重新安裝。</string>
+    <string name="desktop_restore_failed_title">有些軟體無法還原</string>
+    <string name="desktop_restore_failed_body">請看 ~/.cache/droiddeck/apt-restore.log，再到 Konsole 試試 sudo apt install。</string>
     <string name="gog_full_files">無法使用原生最佳化，下載內容包含完整的替換檔案。</string>
     <string name="gog_recover">驗證修補結果</string>
     <string name="slow_usb_title">USB 連線速度太慢</string>
