@@ -639,6 +639,8 @@
     <string name="driver_delete_plain">它的檔案會從 App 移除。</string>
     <string name="driver_delete_in_use">它的檔案會被移除。它正在使用中，所以會改用預設。</string>
     <string name="drawer_page_display">顯示</string>
+    <string name="drawer_frame_limit">畫格限制</string>
+    <string name="drawer_frame_limit_note">限制這個遊戲的畫格速率。有能被上限整除的螢幕更新率時，螢幕會切換到那個更新率；其他上限看起來可能不平順。Steam 遊戲請用 Steam 快速存取選單的畫格限制。</string>
     <string name="drawer_page_effects">效果</string>
     <string name="drawer_page_controls">操作</string>
     <string name="drawer_page_components">元件</string>
@@ -1264,7 +1266,6 @@
     <string name="games_never_played">從未玩過</string>
     <string name="games_runtime_busy_percent">執行環境忙碌中 · %1$d%%</string>
     <string name="games_runtime_busy">執行環境忙碌中</string>
-    <string name="games_runtime_first_play">第一次按「啟動 Steam」時安裝執行環境</string>
     <string name="games_runtime_update">執行環境有可用的更新</string>
     <string name="games_runtime_ready">● 執行環境已就緒</string>
     <string name="games_internal">內部儲存空間</string>
@@ -1762,6 +1763,8 @@
     <string name="fm_accept">確定</string>
     <string name="fm_decline">不要</string>
     <string name="fm_drive_not_readable">%1$s 已掛載，但目前無法讀取</string>
+    <string name="fm_drive_access_title">允許存取 %1$s</string>
+    <string name="fm_drive_access_text">Android 讓 DroidDeck 看得到這個磁碟，但不能讀取。請替 DroidDeck 開啟「所有檔案存取權」，再回到這裡。</string>
     <string name="fm_list_view">清單檢視</string>
     <string name="fm_grid_view">格狀檢視</string>
     <string name="fm_search">搜尋</string>
@@ -1858,6 +1861,7 @@
     <string name="flatpakmgr_not_ready">請先設定 Flatpak</string>
     <string name="flatpakmgr_starting">正在啟動</string>
     <string name="flatpakmgr_exit_status">Flatpak 已結束，狀態碼 %1$d</string>
+    <string name="flatpakmgr_wrong_arch">%1$s 是 %2$s 版，DroidDeck 無法執行。這裡的 Flatpak App 需要 ARM64 或 x86_64 版本。</string>
     <string name="flatpakmgr_installing">正在安裝 %1$s</string>
     <string name="flatpakmgr_updating">正在更新 %1$s</string>
     <string name="flatpakmgr_removing">正在移除 %1$s</string>
@@ -3339,4 +3343,9 @@
     <string name="slow_usb_port">%1$s 以 %2$s 連接（%3$s Mbps，約 %4$d MB/s）。這部裝置的 USB 連接埠沒辦法更快，上面的遊戲會載入得很慢。內部儲存空間或 microSD 卡可能比較快。</string>
     <string name="slow_usb_never">不要再顯示</string>
     <string name="slow_usb_dismiss">關閉</string>
+    <string name="steam_import_title">要重新啟動 Steam 來加入你的遊戲嗎？</string>
+    <string name="steam_import_body">Steam 可以把你擁有的這些遊戲列為已安裝：%1$s。要重新啟動才會顯示。現在重新啟動，或等下次 Steam 啟動時再加入。</string>
+    <string name="steam_import_names_more">%1$s 和另外 %2$d 個</string>
+    <string name="steam_import_now">立即重新啟動</string>
+    <string name="steam_import_later">稍後</string>
 </resources>
