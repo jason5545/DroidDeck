@@ -725,7 +725,6 @@
     <string name="hud_export_failed">Couldn\'t save the HUD report.</string>
     <string name="hud_reset">Reset HUD settings</string>
     <string name="hud_reset_button">Reset</string>
-    <string name="hud_credit">FusionHUD by The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Scaling mode</string>
     <string name="drawer_scaling_sharpness">Scaling sharpness</string>
     <string name="drawer_effects">Screen effects</string>
@@ -2509,6 +2508,9 @@
     <string name="edit_target">Target</string>
     <string name="edit_start_in">Start in</string>
     <string name="edit_launch_options">Launch options</string>
+    <string name="edit_launch_options_steam_hint">Shared with Steam\'s Properties: a change in either one shows in both.</string>
+    <string name="edit_launch_options_not_saved">Could not save the launch options to Steam. Try again.</string>
+    <string name="edit_launch_options_desktop">Steam may be open in the desktop session. Change the launch options in its Properties, or close the session first.</string>
     <string name="edit_artwork">Artwork</string>
     <string name="edit_other_exe">Other exe…</string>
     <string name="edit_remove">Remove</string>

@@ -701,7 +701,6 @@
     <string name="hud_export_failed">HUD-rapporten kunne ikke gemmes.</string>
     <string name="hud_reset">Nulstil HUD-indstillinger</string>
     <string name="hud_reset_button">Nulstil</string>
-    <string name="hud_credit">FusionHUD af The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Skaleringstilstand</string>
     <string name="drawer_scaling_sharpness">Skaleringsskarphed</string>
     <string name="drawer_effects">Skærmeffekter</string>
@@ -2382,6 +2381,9 @@
     <string name="edit_target">Mål</string>
     <string name="edit_start_in">Start i</string>
     <string name="edit_launch_options">Startindstillinger</string>
+    <string name="edit_launch_options_steam_hint">Delt med Egenskaber i Steam: en ændring det ene sted vises begge steder.</string>
+    <string name="edit_launch_options_not_saved">Startindstillingerne kunne ikke gemmes i Steam. Prøv igen.</string>
+    <string name="edit_launch_options_desktop">Steam kan være åben i skrivebordssessionen. Skift startindstillingerne under dens Egenskaber, eller luk sessionen først.</string>
     <string name="edit_artwork">Grafik</string>
     <string name="edit_other_exe">Anden exe…</string>
     <string name="edit_remove">Fjern</string>

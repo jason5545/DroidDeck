@@ -452,7 +452,7 @@ class GameEnvironmentTest(unittest.TestCase):
                 (game / name).touch()
             env, extra, notes = MODULE["engine_fixes"](str(game / "Game.exe"), [])
             self.assertEqual(env["FEX_TSOENABLED"], "1")
-            self.assertEqual(env["FEX_MULTIBLOCK"], "0")
+            self.assertNotIn("FEX_MULTIBLOCK", env)
             # Sentry's and tabtip's overrides both survive: two fixes, one variable.
             self.assertEqual(env["WINEDLLOVERRIDES"], "libsentry.windows.release.x86_64=d;tabtip.exe=d")
             self.assertEqual(extra, ["--rendering-driver", "vulkan"])

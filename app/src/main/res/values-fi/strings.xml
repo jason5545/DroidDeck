@@ -701,7 +701,6 @@
     <string name="hud_export_failed">HUD-raporttia ei voitu tallentaa.</string>
     <string name="hud_reset">Palauta HUD-asetukset</string>
     <string name="hud_reset_button">Palauta</string>
-    <string name="hud_credit">FusionHUD, tekijä The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Skaalaustila</string>
     <string name="drawer_scaling_sharpness">Skaalauksen terävyys</string>
     <string name="drawer_effects">Näyttötehosteet</string>
@@ -2382,6 +2381,9 @@
     <string name="edit_target">Kohde</string>
     <string name="edit_start_in">Käynnistyskansio</string>
     <string name="edit_launch_options">Käynnistysasetukset</string>
+    <string name="edit_launch_options_steam_hint">Jaettu Steamin Ominaisuuksien kanssa: muutos jommassakummassa näkyy molemmissa.</string>
+    <string name="edit_launch_options_not_saved">Käynnistysasetuksia ei voitu tallentaa Steamiin. Yritä uudelleen.</string>
+    <string name="edit_launch_options_desktop">Steam voi olla auki työpöytäistunnossa. Muuta käynnistysasetuksia sen Ominaisuuksista tai sulje istunto ensin.</string>
     <string name="edit_artwork">Kuvitus</string>
     <string name="edit_other_exe">Toinen exe…</string>
     <string name="edit_remove">Poista</string>

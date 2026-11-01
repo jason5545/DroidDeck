@@ -701,7 +701,6 @@
     <string name="hud_export_failed">Nem sikerült menteni a HUD-jelentést.</string>
     <string name="hud_reset">HUD-beállítások visszaállítása</string>
     <string name="hud_reset_button">Visszaállítás</string>
-    <string name="hud_credit">FusionHUD, készítette: The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Méretezési mód</string>
     <string name="drawer_scaling_sharpness">Méretezési élesség</string>
     <string name="drawer_effects">Képernyőeffektek</string>
@@ -2382,6 +2381,9 @@
     <string name="edit_target">Cél</string>
     <string name="edit_start_in">Indítás innen</string>
     <string name="edit_launch_options">Indítási beállítások</string>
+    <string name="edit_launch_options_steam_hint">Közös a Steam Tulajdonságaival: az egyik helyen végzett módosítás mindkettőben megjelenik.</string>
+    <string name="edit_launch_options_not_saved">Az indítási beállításokat nem sikerült menteni a Steambe. Próbáld újra.</string>
+    <string name="edit_launch_options_desktop">Lehet, hogy a Steam nyitva van az asztali munkamenetben. Módosítsd az indítási beállításokat a Tulajdonságaiban, vagy előbb zárd be a munkamenetet.</string>
     <string name="edit_artwork">Illusztráció</string>
     <string name="edit_other_exe">Másik exe…</string>
     <string name="edit_remove">Eltávolítás</string>

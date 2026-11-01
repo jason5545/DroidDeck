@@ -701,7 +701,6 @@
     <string name="hud_export_failed">HUD raporu kaydedilemedi.</string>
     <string name="hud_reset">HUD ayarlarını sıfırla</string>
     <string name="hud_reset_button">Sıfırla</string>
-    <string name="hud_credit">FusionHUD, yapımcı: The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Ölçekleme modu</string>
     <string name="drawer_scaling_sharpness">Ölçekleme keskinliği</string>
     <string name="drawer_effects">Ekran efektleri</string>
@@ -2371,6 +2370,9 @@
     <string name="edit_target">Hedef</string>
     <string name="edit_start_in">Başlangıç yeri</string>
     <string name="edit_launch_options">Başlatma seçenekleri</string>
+    <string name="edit_launch_options_steam_hint">Steam Özellikleri ile ortaktır: birinde yapılan değişiklik ikisinde de görünür.</string>
+    <string name="edit_launch_options_not_saved">Başlatma seçenekleri Steam\'e kaydedilemedi. Tekrar deneyin.</string>
+    <string name="edit_launch_options_desktop">Steam masaüstü oturumunda açık olabilir. Başlatma seçeneklerini Steam Özellikleri\'nden değiştirin veya önce oturumu kapatın.</string>
     <string name="edit_artwork">Görsel</string>
     <string name="edit_other_exe">Diğer exe…</string>
     <string name="edit_remove">Kaldır</string>

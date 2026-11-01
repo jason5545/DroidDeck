@@ -705,7 +705,6 @@
     <string name="hud_export_failed">Не удалось сохранить отчет HUD.</string>
     <string name="hud_reset">Сбросить настройки HUD</string>
     <string name="hud_reset_button">Сбросить</string>
-    <string name="hud_credit">FusionHUD от The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Режим масштабирования</string>
     <string name="drawer_scaling_sharpness">Резкость масштабирования</string>
     <string name="drawer_effects">Экранные эффекты</string>
@@ -2425,6 +2424,9 @@
     <string name="edit_target">Объект</string>
     <string name="edit_start_in">Рабочая папка</string>
     <string name="edit_launch_options">Параметры запуска</string>
+    <string name="edit_launch_options_steam_hint">Общие со «Свойствами» Steam: изменение в одном месте видно в обоих.</string>
+    <string name="edit_launch_options_not_saved">Не удалось сохранить параметры запуска в Steam. Попробуйте ещё раз.</string>
+    <string name="edit_launch_options_desktop">Steam может быть открыт в сессии рабочего стола. Измените параметры запуска в его «Свойствах» или сначала закройте сессию.</string>
     <string name="edit_artwork">Обложки</string>
     <string name="edit_other_exe">Другой exe…</string>
     <string name="edit_remove">Убрать</string>

@@ -701,7 +701,6 @@
     <string name="hud_export_failed">Отчетът за HUD не можа да бъде записан.</string>
     <string name="hud_reset">Нулиране на настройките на HUD</string>
     <string name="hud_reset_button">Нулиране</string>
-    <string name="hud_credit">FusionHUD от The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Режим на мащабиране</string>
     <string name="drawer_scaling_sharpness">Острота на мащабиране</string>
     <string name="drawer_effects">Ефекти на екрана</string>
@@ -2382,6 +2381,9 @@
     <string name="edit_target">Цел</string>
     <string name="edit_start_in">Старт в</string>
     <string name="edit_launch_options">Настройки за стартиране</string>
+    <string name="edit_launch_options_steam_hint">Общи са със „Свойства“ в Steam: промяна на едното място се вижда и на двете.</string>
+    <string name="edit_launch_options_not_saved">Настройките за стартиране не можаха да бъдат запазени в Steam. Опитайте отново.</string>
+    <string name="edit_launch_options_desktop">Steam може да е отворен в сесията на работния плот. Променете настройките за стартиране в неговите „Свойства“ или първо затворете сесията.</string>
     <string name="edit_artwork">Визия</string>
     <string name="edit_other_exe">Друг exe…</string>
     <string name="edit_remove">Премахни</string>

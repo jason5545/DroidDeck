@@ -701,7 +701,6 @@
     <string name="hud_export_failed">Δεν ήταν δυνατή η αποθήκευση της αναφοράς HUD.</string>
     <string name="hud_reset">Επαναφορά ρυθμίσεων HUD</string>
     <string name="hud_reset_button">Επαναφορά</string>
-    <string name="hud_credit">FusionHUD από The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Λειτουργία κλιμάκωσης</string>
     <string name="drawer_scaling_sharpness">Οξύτητα κλιμάκωσης</string>
     <string name="drawer_effects">Εφέ οθόνης</string>
@@ -2382,6 +2381,9 @@
     <string name="edit_target">Προορισμός</string>
     <string name="edit_start_in">Εκκίνηση σε</string>
     <string name="edit_launch_options">Επιλογές εκκίνησης</string>
+    <string name="edit_launch_options_steam_hint">Κοινές με τις Ιδιότητες του Steam: μια αλλαγή στο ένα σημείο εμφανίζεται και στα δύο.</string>
+    <string name="edit_launch_options_not_saved">Δεν ήταν δυνατή η αποθήκευση των επιλογών εκκίνησης στο Steam. Δοκιμάστε ξανά.</string>
+    <string name="edit_launch_options_desktop">Το Steam μπορεί να είναι ανοιχτό στη συνεδρία επιφάνειας εργασίας. Αλλάξτε τις επιλογές εκκίνησης από τις Ιδιότητές του ή κλείστε πρώτα τη συνεδρία.</string>
     <string name="edit_artwork">Γραφικά</string>
     <string name="edit_other_exe">Άλλο exe…</string>
     <string name="edit_remove">Κατάργηση</string>

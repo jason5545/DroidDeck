@@ -705,7 +705,6 @@
     <string name="hud_export_failed">Nie udało się zapisać raportu HUD.</string>
     <string name="hud_reset">Zresetuj ustawienia HUD</string>
     <string name="hud_reset_button">Resetuj</string>
-    <string name="hud_credit">FusionHUD autorstwa The412Banner, github.com/The412Banner/FusionHUD (GPL-3.0).</string>
     <string name="drawer_scaling">Tryb skalowania</string>
     <string name="drawer_scaling_sharpness">Ostrość skalowania</string>
     <string name="drawer_effects">Efekty ekranowe</string>
@@ -2428,6 +2427,9 @@
     <string name="edit_target">Element docelowy</string>
     <string name="edit_start_in">Uruchom w</string>
     <string name="edit_launch_options">Opcje uruchamiania</string>
+    <string name="edit_launch_options_steam_hint">Wspólne z Właściwościami w Steam: zmiana w jednym miejscu jest widoczna w obu.</string>
+    <string name="edit_launch_options_not_saved">Nie udało się zapisać opcji uruchamiania w Steam. Spróbuj ponownie.</string>
+    <string name="edit_launch_options_desktop">Steam może być otwarty w sesji pulpitu. Zmień opcje uruchamiania w jego Właściwościach albo najpierw zamknij sesję.</string>
     <string name="edit_artwork">Grafika</string>
     <string name="edit_other_exe">Inny plik exe…</string>
     <string name="edit_remove">Usuń</string>
