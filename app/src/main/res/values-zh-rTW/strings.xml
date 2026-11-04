@@ -1388,6 +1388,15 @@
     <string name="proton_cancel_queued">取消排隊</string>
     <string name="pckb_android">Android 鍵盤</string>
     <string name="pckb_hide">隱藏  ✕</string>
+    <string name="pckb_size">螢幕上的大小</string>
+    <string name="pckb_size_hint">鍵盤佔畫面的比例，包含標題列。</string>
+    <string name="pckb_opacity">不透明度</string>
+    <string name="pckb_opacity_hint">調低就能看到鍵盤後面的遊戲。</string>
+    <string name="pckb_hidden_keys">隱藏的按鍵</string>
+    <string name="pckb_hidden_keys_hint">不常用的按鍵不放在鍵盤上。</string>
+    <string name="pckb_group_function">Esc 和功能鍵列</string>
+    <string name="pckb_group_nav">Ins／Del／Home／End／PgUp／PgDn</string>
+    <string name="pckb_group_arrows">方向鍵</string>
     <string name="main_launch_named">啟動 %1$s</string>
     <string name="main_choose_screen">選擇螢幕。副螢幕：%1$s。</string>
     <string name="main_secondary_gone">副螢幕已經無法使用。</string>
