@@ -422,6 +422,9 @@
     <string name="wincomp_unsupported">這裡還不支援</string>
     <string name="wincomp_loading">正在載入元件…</string>
     <string name="wincomp_failed">無法安裝：%1$s</string>
+    <string name="wincomp_repair_required">這個下載項目需要更新。</string>
+    <string name="wincomp_repair_queued">已排入更新。</string>
+    <string name="wincomp_retry">重試更新</string>
     <string name="wincomp_downloaded">已下載</string>
     <string name="wincomp_downloading">正在下載 %1$s</string>
     <string name="wincomp_installing">正在安裝：%1$s</string>
@@ -707,6 +710,8 @@
     <string name="hud_group_metrics">讀數</string>
     <string name="hud_metric_graph">畫格時間圖表</string>
     <string name="hud_metric_decimal">畫格速率顯示小數</string>
+    <string name="hud_metric_low1">1% low</string>
+    <string name="hud_metric_low01">0.1% low</string>
     <string name="hud_metric_low001">0.01% low</string>
     <string name="hud_metric_engine">圖形引擎</string>
     <string name="hud_metric_gpu_model">GPU 名稱</string>
@@ -808,6 +813,10 @@
     <string name="drawer_low_latency_touch">低延遲觸控</string>
     <string name="drawer_low_latency_touch_hint">觸控不等畫格批次處理；Steam 的觸控控制項以 1000 Hz 回報。CPU 用量會稍微增加。</string>
     <string name="drawer_evdev_mouse">原始滑鼠通道</string>
+    <string name="drawer_relative_mouse">相對滑鼠</string>
+    <string name="drawer_relative_mouse_auto">自動</string>
+    <string name="drawer_relative_mouse_on">開啟</string>
+    <string name="drawer_relative_mouse_off">關閉</string>
     <string name="drawer_direct_cursor">游標</string>
     <string name="drawer_pc_keyboard">PC 鍵盤</string>
     <string name="drawer_android_keyboard">Android</string>
@@ -898,6 +907,13 @@
     <string name="setup_session">工作階段</string>
     <string name="setup_logs">工作階段記錄檔</string>
     <string name="setup_logs_hint">每次工作階段結束後儲存</string>
+    <string name="setup_enhanced_diagnostics">下次工作階段使用加強診斷</string>
+    <string name="setup_enhanced_diagnostics_hint">記錄一次工作階段的詳細記錄檔。可能降低效能、占用更多儲存空間。工作階段開始時會自動關閉；分享前請先檢查記錄檔。</string>
+    <string name="diagnostics_share_title">分享診斷資料包</string>
+    <string name="diagnostics_share_session">工作階段和裝置</string>
+    <string name="diagnostics_share_graphics">圖形</string>
+    <string name="diagnostics_share_games">遊戲和相容性</string>
+    <string name="diagnostics_share_all">所有資料包</string>
     <string name="setup_game_debug_logs">遊戲偵錯記錄檔</string>
     <string name="setup_game_debug_logs_hint">下次啟動遊戲時，一併收集 Proton、Wine 和圖形的診斷資訊。可能降低效能，也會占用更多儲存空間。</string>
     <string name="setup_game_debug_logs_restart">重新啟動這個工作階段，才會儲存遊戲偵錯記錄檔</string>
@@ -907,6 +923,19 @@
     <string name="setup_saved_logs">保留的工作階段記錄檔</string>
     <string name="setup_saved_logs_hint">保留最新的 %1$d 份</string>
     <string name="setup_clear_logs">清除記錄檔</string>
+    <string name="setup_log_sessions">可用的工作階段記錄檔</string>
+    <string name="setup_log_empty">還沒有儲存的工作階段記錄檔。</string>
+    <string name="setup_log_export_hint">分享和儲存的 ZIP 包含選取的工作階段，以及相關的 Steam、商店、工具和 Battle.net 診斷資料。</string>
+    <string name="setup_log_size_date">%1$s · %2$s</string>
+    <string name="setup_log_current">目前的工作階段</string>
+    <string name="setup_log_share">分享</string>
+    <string name="setup_log_save">儲存到裝置</string>
+    <string name="setup_log_delete">刪除</string>
+    <string name="setup_log_delete_title">要刪除工作階段記錄檔嗎？</string>
+    <string name="setup_log_delete_message">要刪除 %1$s 嗎？這個動作無法復原。</string>
+    <string name="setup_log_export_saved">已儲存工作階段記錄檔。</string>
+    <string name="setup_log_export_failed">無法儲存工作階段記錄檔。</string>
+    <string name="setup_log_delete_failed">無法刪除工作階段記錄檔。</string>
     <string name="setup_reset_settings">重設所有設定</string>
     <string name="setup_reset_settings_hint">把所有設定還原成預設值</string>
     <string name="setup_reset_settings_button">重設</string>
@@ -933,6 +962,7 @@
     <string name="setup_home">當成主畫面使用</string>
     <string name="setup_home_on">DroidDeck 可以當主畫面 App</string>
     <string name="setup_home_off">DroidDeck 不會出現在主畫面 App 的選項裡</string>
+    <string name="setup_home_game_space_first">在「新增遊戲」裡把 DroidDeck 設為「包含」</string>
     <string name="setup_orientation">螢幕方向</string>
     <string name="setup_launcher_orientation">啟動器方向</string>
     <string name="setup_launcher_orientation_auto">跟著裝置旋轉</string>
@@ -953,7 +983,7 @@
     <string name="setup_dual_screen_on">開啟</string>
     <string name="setup_dual_screen_off">關閉</string>
     <string name="setup_dual_screen_controls">遊戲中的下方螢幕控制項</string>
-    <string name="setup_dual_screen_controls_hint">工作階段開始時，在第二螢幕開啟觸控板和鍵盤。</string>
+    <string name="setup_dual_screen_controls_hint">工作階段開始時，在第二螢幕開啟面板：用 Steam Deck 或 Steam Controller 時是 Deck 按鍵和觸控板，其他情況是上次用的那個。</string>
     <string name="dual_typing_title">輸入到上方螢幕</string>
     <string name="dual_typing_done">完成</string>
     <string name="setup_default_home">預設主畫面 App</string>
@@ -1166,6 +1196,7 @@
     <string name="ctrl_stick_click_hint">在搖桿上點兩下並按住，就是 L3 或 R3</string>
     <string name="ctrl_adaptive">自適應搖桿</string>
     <string name="ctrl_rumble">遊戲震動</string>
+    <string name="ctrl_dead_zone">搖桿死區</string>
     <string name="ctrl_steam_button">Steam 按鈕</string>
     <string name="ctrl_qam_button">快速存取按鈕</string>
     <string name="ctrl_keyboard_button">鍵盤按鈕</string>
@@ -1284,6 +1315,13 @@
     <string name="games_export_gamehub">匯出成 GameHub zip…</string>
     <string name="games_export_winlator">匯出成 Winlator zip…</string>
     <string name="games_open_save_folder">開啟存檔資料夾</string>
+    <string name="games_import_addons">從壓縮檔匯入外掛…</string>
+    <string name="games_open_addons_folder">開啟外掛資料夾</string>
+    <string name="games_delete_addon_title">要刪除 %1$s 嗎？</string>
+    <string name="games_delete_addon_body">這會移除外掛的資料夾，設定會保留。</string>
+    <plurals name="games_addons_count">
+        <item quantity="other">%1$d 個外掛</item>
+    </plurals>
     <string name="games_never_played">從未玩過</string>
     <string name="games_runtime_busy_percent">執行環境忙碌中 · %1$d%%</string>
     <string name="games_runtime_busy">執行環境忙碌中</string>
@@ -1467,6 +1505,16 @@
     </plurals>
     <plurals name="main_saves_imported_backup">
         <item quantity="other">已從 %2$s 匯入 %1$d 個檔案到 %3$s。舊存檔已備份到 Download/DroidDeck/Saves/backups</item>
+    </plurals>
+    <string name="main_addons_close_session">請先關閉工作階段，以免遊戲在匯入時用到外掛</string>
+    <string name="main_addons_importing">正在把外掛匯入到 %1$s</string>
+    <string name="main_addons_pick_zip">選擇 %1$s 的外掛壓縮檔</string>
+    <string name="main_addons_too_large">%1$s 太大，無法匯入</string>
+    <string name="main_addons_deleting">正在刪除 %1$s</string>
+    <string name="main_addons_deleted">已刪除 %1$s</string>
+    <string name="main_addons_none">%1$s 裡沒有找到外掛</string>
+    <plurals name="main_addons_imported">
+        <item quantity="other">已把 %1$d 個外掛匯入到 %2$s</item>
     </plurals>
     <string name="main_saves_pick_zip">選擇 %1$s 的存檔壓縮檔</string>
     <string name="main_saves_exporting">正在匯出 %1$s</string>
@@ -2128,6 +2176,7 @@
     <string name="loadstate_starting">正在啟動工作階段…</string>
     <string name="loadstate_elapsed">已經過 %1$d:%2$02d · 仍在處理中</string>
     <string name="loadstate_steam_update">正在下載 Steam 用戶端更新 · %1$d%%</string>
+    <string name="loadstate_steam_update_applying">正在套用 Steam 用戶端更新…</string>
     <string name="loadstate_steam_client">正在下載 Steam 用戶端 · %1$s</string>
     <string name="pextra_busy">已有相容性工具正在安裝</string>
     <string name="pextra_stop_session">安裝相容性工具前，請先停止執行中的工作階段</string>
@@ -3548,6 +3597,7 @@
     <string name="game_resource_steam_cloud_detail">適用於存檔放在 Steam 帳號上的遊戲</string>
     <string name="game_resource_search">網路搜尋</string>
     <string name="game_tab_launch">啟動</string>
+    <string name="game_tab_addons">外掛</string>
     <string name="game_tab_saves_cloud">存檔與雲端</string>
     <string name="game_tab_install">安裝</string>
     <string name="game_launch_shortcut">Steam 捷徑</string>
@@ -3590,19 +3640,18 @@
     <string name="integration_wifi">Wi-Fi 名稱</string>
     <string name="integration_brightness">亮度</string>
     <string name="integration_home">DroidDeck 當主畫面</string>
-    <string name="integration_shortcuts">主畫面按鈕快捷鍵</string>
+    <string name="integration_shortcuts">系統按鍵</string>
     <string name="integration_wifi_hint">在 Steam 裡顯示網路 · 需要位置權限，不會追蹤你的位置</string>
     <string name="integration_wifi_on">網路會顯示在 Steam 裡</string>
     <string name="integration_wifi_location_off">定位服務已關閉</string>
     <string name="integration_wifi_denied">位置權限遭拒 · 請到應用程式資訊允許</string>
     <string name="integration_brightness_hint">Steam 的滑桿會調整螢幕亮度</string>
     <string name="integration_home_hint">工作階段中按主畫面按鈕會開啟 Steam 選單</string>
-    <string name="integration_shortcuts_hint">按住主畫面按鈕，就能用 Steam 鍵的組合鍵</string>
-    <string name="integration_shortcuts_needs_home">需要把 DroidDeck 當主畫面</string>
+    <string name="integration_shortcuts_hint">Alt+Tab、Win 鍵和主畫面按鈕留在工作階段裡</string>
     <string name="integration_shortcuts_maybe_restricted">在 Android 裡是灰色的？應用程式資訊 → ⋮ → 允許受限制的設定</string>
     <string name="integration_shortcuts_restricted">被 Android 封鎖 · 應用程式資訊 → ⋮ → 允許受限制的設定</string>
-    <string name="integration_shortcuts_service">DroidDeck 主畫面按鈕</string>
-    <string name="integration_shortcuts_service_description">Steam 工作階段在前景、而且 DroidDeck 是預設主畫面 App 時，把主畫面按鈕轉給 Steam 鍵。不會讀取螢幕內容。</string>
+    <string name="integration_shortcuts_service">DroidDeck 系統按鍵</string>
+    <string name="integration_shortcuts_service_description">DroidDeck 工作階段在前景時，Alt+Tab、Win 鍵和主畫面按鈕交給工作階段，不交給 Android。</string>
     <string name="integration_brightness_needed">請到設定 → Steam 整合開啟亮度</string>
     <string name="desktop_restore_title">正在還原你的軟體</string>
     <string name="desktop_restore_body">DroidDeck 更新後，正在重新安裝你加入的 App。</string>

@@ -524,6 +524,10 @@ class SessionService : Service() {
             guest.add("BL_VENC_SOCKET=" + encoder.socket.absolutePath)
         }
         startVkBridge(guest, sessionDir)
+        com.droiddeck.launcher.gpu.ClockLogComponent(File(sessionDir, "clocks.log")).let {
+            it.attach(this)
+            components.add(it)
+        }
 
         guest.add("BL_WIDTH=" + size.first)
         guest.add("BL_HEIGHT=" + size.second)
@@ -540,6 +544,7 @@ class SessionService : Service() {
         guest.add("BL_REFRESH=" + Math.round(SessionState.refreshHz))
         guest.add("BL_LOG=" + sessionLog.path)
         guest.add("BL_DEBUG_DIR=" + sessionDir.path)
+        if (EnhancedDiagnostics.isActive(this, sessionDir)) guest.add("DROIDDECK_ENHANCED_DIAGNOSTICS=1")
 
         val fakeInputDir = File(sessionRoot, "dev/input").apply { mkdirs() }
         val controllersOn = !File(Environment.getExternalStorageDirectory(), NO_PAD_SWITCH).exists()
@@ -768,11 +773,18 @@ class SessionService : Service() {
         SessionState.sessionId = sessionDir.name
         SessionState.eventsFile = File(sessionDir, "events.jsonl")
         SessionEvents.record("session.logs_ready", mapOf("logDir" to sessionDir.path))
+        if (EnhancedDiagnostics.isActive(this, sessionDir)) SessionEvents.record("diagnostics.enhanced", mapOf("schema" to 1))
         DeviceReport.write(this, File(sessionDir, "device.txt"), SessionState.mode)
         NetworkReport.write(this, File(sessionDir, "network.txt"))
         SessionLogCapture.start(File(sessionDir, "app.log"))
         MemoryLog.start()
         return sessionDir
+    }
+
+    private fun relativeMouseForSession(): Int {
+        val game = if (SessionState.mode == MODE_RUN) SessionState.program?.let { "program:$it" }
+            else SessionState.gameId?.toLongOrNull()?.toString()
+        return com.droiddeck.launcher.input.GesturePrefs.read(this, game).relativeMouseMode
     }
 
     private fun addClientEnvironment(guest: MutableList<String>, steamHere: Boolean, agentEnvironment: List<String>) {
@@ -850,6 +862,7 @@ class SessionService : Service() {
         guest.add("BL_FSYNC_FIRST=" + (if (SessionPrefs.fsyncFirst(this)) "1" else "0"))
         guest.add("BL_GAMESCOPE_REALTIME=" + (if (SessionPrefs.gamescopeRealtime(this)) "1" else "0"))
         if (SessionPrefs.cursorComposite(this)) guest.add("BL_CURSOR_COMPOSITE=1")
+        relativeMouseForSession().takeIf { it != 0 }?.let { guest.add("gamescope_relative_mouse=$it") }
         if (com.droiddeck.launcher.core.ZramSupport.supported()) {
             guest.add("BL_ZRAM=1")
             if (steamHere) SessionPrefs.ramCapMb(this).takeIf { it > 0 }?.let { guest.add("BL_RAM_CAP_MB=$it") }
@@ -878,10 +891,6 @@ class SessionService : Service() {
         val bridge = com.droiddeck.launcher.gpu.VkBridgeComponent(socket, File(sessionDir, "vkbridge-server.log"))
         bridge.attach(this)
         components.add(bridge)
-        com.droiddeck.launcher.gpu.ClockLogComponent(File(sessionDir, "vkbridge-clocks.log")).let {
-            it.attach(this)
-            components.add(it)
-        }
         guest.add("BL_VKBRIDGE=1")
         guest.add("VKBRIDGE_SOCKET=" + socket.path)
         guest.add("VKBRIDGE_CLIENT_LOG=" + File(sessionDir, "vkbridge-client.log").path)

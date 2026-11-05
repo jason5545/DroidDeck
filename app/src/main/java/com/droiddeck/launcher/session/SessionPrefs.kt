@@ -843,7 +843,7 @@ object SessionPrefs {
             key = "logs",
             oldValue = logsEnabled(context),
             newValue = on,
-            newEffective = on && gameDebugLogsEnabled(context) && SessionPaths.currentSessionLogsRetained(context),
+            newEffective = gameDebugLogsEffective(context, on, gameDebugLogsEnabled(context)),
         )
     }
 
@@ -856,7 +856,7 @@ object SessionPrefs {
             key = "gameDebugLogsEnabled",
             oldValue = gameDebugLogsEnabled(context),
             newValue = on,
-            newEffective = logsEnabled(context) && on && SessionPaths.currentSessionLogsRetained(context),
+            newEffective = gameDebugLogsEffective(context, logsEnabled(context), on),
         )
     }
 
@@ -869,8 +869,7 @@ object SessionPrefs {
     ): Boolean {
         if (oldValue == newValue) return true
         val saved = prefs(context)
-        val oldEffective = logsEnabled(context) && gameDebugLogsEnabled(context) &&
-            SessionPaths.currentSessionLogsRetained(context)
+        val oldEffective = gameDebugLogsEffective(context)
         fun publish(value: Boolean) = GameEnvironmentStore.publish(context, gameDebugLogsOverride = value)
         if (oldEffective == newEffective) {
             if (saved.edit().putBoolean(key, newValue).commit()) return true
@@ -905,6 +904,13 @@ object SessionPrefs {
             false
         }
     }
+
+    internal fun gameDebugLogsEffective(
+        context: Context,
+        logs: Boolean = logsEnabled(context),
+        gameLogs: Boolean = gameDebugLogsEnabled(context),
+    ): Boolean = EnhancedDiagnostics.isCurrentSessionActive(context) ||
+        (logs && gameLogs && SessionPaths.currentSessionLogsRetained(context))
 
     fun battleNetNoSteamSet(context: Context): Boolean = prefs(context).getBoolean("battleNetNoSteamSet", false)
     fun setBattleNetNoSteamSet(context: Context) { prefs(context).edit().putBoolean("battleNetNoSteamSet", true).apply() }
