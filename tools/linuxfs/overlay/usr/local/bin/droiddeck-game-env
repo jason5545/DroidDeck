@@ -127,6 +127,12 @@ def d3dgear_hook(game):
 
 
 @fix
+def supergiant_dotnet_reporter(game):
+    if "basecampbugreporter.native.dll" in game.files:
+        return {"WINEDLLOVERRIDES": "mscoree=n,b"}, [], "Supergiant: allow the builtin mscoree"
+
+
+@fix
 def deep_rock_gdk_raytracing(game):
     if game.stem == "fsd-wingdk-shipping" and not any(game.has_arg(arg) for arg in ("-raytracing", "-noraytracing")):
         return {}, ["-noraytracing", "-ini:Engine:[/Script/Engine.RendererSettings]:r.RayTracing=False"], "Deep Rock Galactic GDK: ray tracing off (D3D12 pipeline creation fails on Thor)"
@@ -375,6 +381,8 @@ def vram_cap(env):
     cap = "dxgi.maxDeviceMemory = %d" % int(value)
     own = result.get("DXVK_CONFIG", "").strip().strip(";").strip()
     result["DXVK_CONFIG"] = cap + "; " + own if own else cap
+    result["DROIDDECK_VRAM_CAP"] = "1"
+    result["DROIDDECK_VRAM_CAP_MB"] = value
     return result
 
 

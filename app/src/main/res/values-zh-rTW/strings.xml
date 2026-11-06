@@ -620,12 +620,12 @@
     <string name="perf_cap_off">關閉</string>
     <string name="perf_cap_auto">驅動程式預設</string>
     <string name="perf_zram_client">遊戲執行時壓縮 Steam</string>
-    <string name="perf_zram_client_hint">遊戲啟動 20 秒後，把 Steam 用戶端壓縮進 zRAM，讓遊戲有更多記憶體，遊戲關閉時再讀回來。如果遊戲啟動後不久工作階段就關閉，請關掉這個選項。設了上面的 RAM 上限時，工作階段超過上限仍會壓縮 Steam。</string>
+    <string name="perf_zram_client_hint">遊戲執行時壓縮 Steam，記憶體吃緊時會提早開始。遊戲關閉後，等 RAM 足夠了再把 Steam 讀回來。如果遊戲啟動後不久工作階段就關閉，請關掉這個選項。設了上面的 RAM 上限時，工作階段超過上限仍會壓縮 Steam。</string>
     <string name="perf_ram_cap">RAM 上限</string>
     <string name="perf_ram_cap_hint">Steam 用戶端執行時套用，Steam 模式或從桌面開都一樣。工作階段用量超過這個值時，會先把 Steam、再把工作階段裡其他支援的程序壓縮進 zRAM。這是軟性上限：不會關掉任何東西，但記憶體分頁讀回來時，遊戲可能會卡頓。</string>
     <string name="perf_ram_cap_unavailable">需要 zRAM 交換空間，這台裝置沒有。</string>
     <string name="perf_vram_cap">VRAM 上限</string>
-    <string name="perf_vram_cap_hint">DXVK 回報給 Direct3D 遊戲的顯示記憶體大小，讓遊戲照比較少的量規劃材質。遊戲自己的 DXVK 設定仍然優先。下次工作階段生效。</string>
+    <string name="perf_vram_cap_hint">把這個顯示記憶體預算回報給 Direct3D 9 到 12 的遊戲，讓遊戲少用一點記憶體。遊戲仍可能超過這個值；這個選項不會增加 GPU 分頁，也不保證不會因記憶體不足而當機。下次工作階段生效。</string>
     <string name="perf_gpuclock">讓 GPU 維持最高時脈</string>
     <string name="perf_gpuclock_hint">僅限 Adreno。比較少頓一下，但更耗電、更熱。</string>
     <string name="perf_fixes">工作階段修正</string>
