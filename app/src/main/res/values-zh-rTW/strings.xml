@@ -3014,6 +3014,8 @@
     <string name="glasses_pro2_experimental">Pro 2 的頭部追蹤還在實驗階段。亮度、音量和顯示切換還不支援。</string>
     <string name="display_picture_position">畫面位置</string>
     <string name="display_position_top">靠上</string>
+    <string name="display_position_left">靠左</string>
+    <string name="display_position_right">靠右</string>
     <string name="display_position_bottom">靠下</string>
     <string name="display_position_center">置中（預設）</string>
     <string name="glasses_6dof">6DoF 虛擬螢幕</string>
@@ -3708,4 +3710,7 @@
     <string name="input_reset_positions">重設位置</string>
     <string name="input_show_label">顯示標籤</string>
     <string name="input_layout_import_failed">無法匯入這個版面配置</string>
+
+    <string name="theme_white_red">緋紅白雪</string>
+    <string name="theme_white_red_detail">白色介面，搭配紅色點綴。</string>
 </resources>
